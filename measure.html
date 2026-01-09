@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>聴力測定 (Calibration)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h2>Step 1: 基準聴力の測定</h2>
+        </header>
+
+        <div class="panel">
+            <h3>静寂時閾値の測定</h3>
+            <p>
+                ゲームを始める前に、あなたの「聞こえの基準（閾値）」を測定します。<br>
+                <strong>部屋を静かにし、いつもの音量設定で開始してください。</strong>
+            </p>
+            <p>
+                開始すると、無音から徐々に「ピー」という音が大きくなります。<br>
+                聞こえ始めたら、すぐに<strong>スペースキー</strong>を押してください。
+            </p>
+
+            <div class="status-box" id="statusBox">待機中</div>
+
+            <button id="btnStart" class="btn-primary">測定開始</button>
+        </div>
+
+        <div id="resultPanel" class="panel hidden">
+            <h3>測定完了</h3>
+            <p>あなたの閾値: <strong id="resultValue" style="font-size:1.5em; color:#f1c40f;">---</strong></p>
+            <p>このデータを保存しました。次のページでトレーニングを開始してください。</p>
+            <button onclick="location.href='game.html'" class="btn-primary">トレーニングへ進む</button>
+        </div>
+    </div>
+    <script src="measure.js"></script>
+</body>
+</html>

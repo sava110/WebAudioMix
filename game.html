@@ -2,47 +2,52 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dual Task Hearing Training</title>
-    <link rel="stylesheet" href="game_style.css">
+    <title>Dual Task Training</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div class="container">
         <header>
-            <h2>Kitchen Typing & Hearing</h2>
-            <div class="stats-bar">
-                <span>Hearing Level: <strong id="volDisplay">0.50</strong></span>
-                <span>Typing Score: <strong id="scoreDisplay">0</strong></span>
-            </div>
+            <h2>Step 2: Dual Task Training</h2>
         </header>
 
         <div id="setupPanel" class="panel">
-            <h3>STEP 1: 準備</h3>
-            <p>1. 環境音（換気扇など）のファイルを選択してください。<br>
-               2. スタートすると英単語が表示されます。タイピングしてください。<br>
-               3. <strong>不定期に「ピピッ」と音が鳴ります。その時だけ「スペースキー」を押してください。</strong>
-            </p>
+            <h3>トレーニング準備</h3>
+            <p>1. 測定された閾値(Limit): <strong id="limitDisplay" style="color:#f1c40f;">---</strong></p>
+            <p>2. 環境音（換気扇など）のファイルを選択してください。</p>
             <input type="file" id="noiseInput" accept="audio/*">
             <br><br>
-            <button id="startBtn" class="btn-primary" disabled>ゲームスタート</button>
+            <p>スタートすると、不定期に「ピピッ」と音が鳴ります。<br>
+               タイピングしながら、音が聞こえたら<strong>スペースキー</strong>を押してください。</p>
+            <button id="btnStart" class="btn-primary" disabled>ゲームスタート</button>
         </div>
 
         <div id="gamePanel" class="panel hidden">
-
-            <div class="typing-area">
-                <div class="word-display" id="wordDisplay">
-                    </div>
-                <p class="sub-text">Type the word!</p>
+            <div class="game-header">
+                <div class="stat-box">
+                    <span class="label">Quiet Limit</span>
+                    <span class="value" id="dispBaseThreshold">---</span>
+                </div>
+                <div class="stat-box">
+                    <span class="label">Current Level</span>
+                    <span class="value" id="dispCurrentVol">0.50</span>
+                </div>
+                <div class="stat-box">
+                    <span class="label">Score</span>
+                    <span class="value" id="dispScore">0</span>
+                </div>
             </div>
 
-            <div id="hearingFeedback" class="feedback-hidden">Good! (Hearing)</div>
+            <div class="typing-area">
+                <div class="romaji-display" id="romajiDisplay"></div>
+                <div class="japanese-display" id="japaneseDisplay"></div>
+            </div>
 
-            <button id="stopBtn" class="btn-secondary">終了する</button>
+            <div id="hearingFeedback" class="feedback-hidden">Good!</div>
+
+            <button id="btnStop" class="btn-secondary">終了する</button>
         </div>
-
     </div>
-
-    <script src="game_script.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
