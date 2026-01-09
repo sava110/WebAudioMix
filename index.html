@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>聴覚実験プロトタイプ</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .control-panel { border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .slider-group { margin-bottom: 15px; }
+        label { display: inline-block; width: 150px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        .status { color: #666; font-size: 0.9em; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <h2>聴覚マスキング実験 プロトタイプ</h2>
+    <p>手順: ノイズファイル(mp3等)を選択し、「再生開始」を押してください。</p>
+
+    <div class="control-panel">
+        <h3>1. ノイズ音源の準備</h3>
+        <input type="file" id="noiseInput" accept="audio/*">
+        <p class="status" id="fileStatus">ファイルが選択されていません</p>
+    </div>
+
+    <div class="control-panel">
+        <h3>2. 実験コントロール</h3>
+
+        <button id="toggleBtn" disabled>再生開始</button>
+
+        <hr>
+
+        <div class="slider-group">
+            <label>シグナル周波数 (Hz):</label>
+            <input type="number" id="freqInput" value="4000" step="100">
+        </div>
+        <div class="slider-group">
+            <label>シグナル音量:</label>
+            <input type="range" id="signalVol" min="0" max="1" step="0.01" value="0.1">
+        </div>
+
+        <div class="slider-group">
+            <label>ノイズ音量:</label>
+            <input type="range" id="noiseVol" min="0" max="1" step="0.01" value="0.5">
+        </div>
+    </div>
+
+    <script>
+        // --- Web Audio API の設定 ---
+        let audioCtx;
+        let noiseBuffer = null;
+
+        // 音源ノードの変数
+        let signalOscillator = null; // ピー音の発生源
+        let noiseSource = null;      // ノイズの発生源
+
+        // 音量ノード
+        let signalGain = null;
+        let noiseGain = null;
+
+        let isPlaying = false;
+
+        const fileInput = document.getElementById('noiseInput');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const fileStatus = document.getElementById('fileStatus');
+
+        // 1. ファイル読み込み処理
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            fileStatus.textContent = "読み込み中...";
+
+            // AudioContextの初期化（ブラウザ制限のため、ユーザー操作が必要な場合があるためここで確認）
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+            const arrayBuffer = await file.arrayBuffer();
+
+            // 音声データをデコード（生データに変換）
+            try {
+                noiseBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                fileStatus.textContent = `読み込み完了: ${file.name}`;
+                toggleBtn.disabled = false;
+            } catch (err) {
+                fileStatus.textContent = "エラー: 音声ファイルの読み込みに失敗しました";
+                console.error(err);
+            }
+        });
+
+        // 2. 再生・停止ボタンの処理
+        toggleBtn.addEventListener('click', () => {
+            // AudioContextがサスペンド状態なら再開（ブラウザ対策）
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            if (isPlaying) {
+                stopSound();
+            } else {
+                playSound();
+            }
+        });
+
+        // 音を鳴らす関数
+        function playSound() {
+            // --- A. シグナル音 (Oscillator) の作成 ---
+            signalOscillator = audioCtx.createOscillator();
+            signalOscillator.type = 'sine'; // 正弦波（サイン波）
+            signalOscillator.frequency.value = document.getElementById('freqInput').value; // 4000Hzなど
+
+            signalGain = audioCtx.createGain();
+            signalGain.gain.value = document.getElementById('signalVol').value;
+
+            // 接続: Oscillator -> Gain -> 出力
+            signalOscillator.connect(signalGain);
+            signalGain.connect(audioCtx.destination);
+
+
+            // --- B. ノイズ音 (BufferSource) の作成 ---
+            noiseSource = audioCtx.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+            noiseSource.loop = true; // ループ再生
+
+            noiseGain = audioCtx.createGain();
+            noiseGain.gain.value = document.getElementById('noiseVol').value;
+
+            // 接続: Buffer -> Gain -> 出力
+            noiseSource.connect(noiseGain);
+            noiseGain.connect(audioCtx.destination);
+
+
+            // --- 再生開始 ---
+            signalOscillator.start();
+            noiseSource.start();
+
+            isPlaying = true;
+            toggleBtn.textContent = "停止";
+
+            // 音量スライダーのリアルタイム反映設定
+            setupVolumeControl();
+        }
+
+        // 音を止める関数
+        function stopSound() {
+            if (signalOscillator) signalOscillator.stop();
+            if (noiseSource) noiseSource.stop();
+
+            isPlaying = false;
+            toggleBtn.textContent = "再生開始";
+        }
+
+        // スライダーを動かしたときにリアルタイムで音量を変える
+        function setupVolumeControl() {
+            document.getElementById('signalVol').oninput = (e) => {
+                if(signalGain) signalGain.gain.value = e.target.value;
+            };
+            document.getElementById('noiseVol').oninput = (e) => {
+                if(noiseGain) noiseGain.gain.value = e.target.value;
+            };
+            document.getElementById('freqInput').onchange = (e) => {
+                if(signalOscillator) {
+                    // 再生中に周波数を変更（ブツっという音がしないよう現在時刻から少し遅らせるのがコツ）
+                    signalOscillator.frequency.setValueAtTime(e.target.value, audioCtx.currentTime);
+                }
+            };
+        }
+    </script>
+</body>
+</html>
