@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual Task Hearing Training</title>
+    <link rel="stylesheet" href="game_style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h2>Kitchen Typing & Hearing</h2>
+            <div class="stats-bar">
+                <span>Hearing Level: <strong id="volDisplay">0.50</strong></span>
+                <span>Typing Score: <strong id="scoreDisplay">0</strong></span>
+            </div>
+        </header>
+
+        <div id="setupPanel" class="panel">
+            <h3>STEP 1: 準備</h3>
+            <p>1. 環境音（換気扇など）のファイルを選択してください。<br>
+               2. スタートすると英単語が表示されます。タイピングしてください。<br>
+               3. <strong>不定期に「ピピッ」と音が鳴ります。その時だけ「スペースキー」を押してください。</strong>
+            </p>
+            <input type="file" id="noiseInput" accept="audio/*">
+            <br><br>
+            <button id="startBtn" class="btn-primary" disabled>ゲームスタート</button>
+        </div>
+
+        <div id="gamePanel" class="panel hidden">
+
+            <div class="typing-area">
+                <div class="word-display" id="wordDisplay">
+                    </div>
+                <p class="sub-text">Type the word!</p>
+            </div>
+
+            <div id="hearingFeedback" class="feedback-hidden">Good! (Hearing)</div>
+
+            <button id="stopBtn" class="btn-secondary">終了する</button>
+        </div>
+
+    </div>
+
+    <script src="game_script.js"></script>
+</body>
+</html>
