@@ -1,0 +1,90 @@
+body {
+    font-family: sans-serif;
+    text-align: center;
+    background-color: #f0f2f5;
+    color: #333;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.panel {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.hidden { display: none; }
+
+/* ボタン類 */
+button {
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+    transition: 0.2s;
+}
+.btn-primary { background-color: #007bff; color: white; }
+.btn-primary:hover { background-color: #0056b3; }
+.btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
+
+.btn-secondary { background-color: #6c757d; color: white; margin-top: 20px;}
+
+/* ゲーム画面の要素 */
+.header-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+.visual-distraction {
+    background: #e9ecef;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+#randomNumber {
+    font-size: 60px;
+    font-weight: bold;
+    color: #555;
+    font-family: monospace;
+}
+
+.feedback-area {
+    height: 50px;
+    line-height: 50px;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+/* フィードバックのアニメーション */
+.feedback-good {
+    color: #28a745;
+    background-color: #d4edda;
+    animation: pop 0.3s ease;
+}
+.feedback-miss {
+    color: #dc3545;
+    background-color: #f8d7da;
+    animation: shake 0.3s ease;
+}
+
+@keyframes pop {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}

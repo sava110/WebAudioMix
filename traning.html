@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聴覚トレーニング (Adaptive)</title>
+    <link rel="stylesheet" href="training_style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h2>聴覚トレーニング (Game Mode)</h2>
+
+        <div id="setupPanel" class="panel">
+            <h3>STEP 1: 環境音の準備</h3>
+            <p>トレーニングの背景に流す「ノイズ音（換気扇など）」を選択してください。</p>
+            <input type="file" id="noiseInput" accept="audio/*">
+            <br><br>
+            <button id="startBtn" class="btn-primary" disabled>トレーニング開始</button>
+        </div>
+
+        <div id="gamePanel" class="panel hidden">
+            <div class="header-info">
+                <span>現在の音量レベル: <strong id="volDisplay">0.50</strong></span>
+                <span>連続正解: <strong id="streakDisplay">0</strong></span>
+            </div>
+
+            <div class="visual-distraction">
+                <p>数字を見ていてください</p>
+                <div id="randomNumber">00</div>
+            </div>
+
+            <div class="feedback-area" id="feedbackMsg">---</div>
+
+            <p class="instruction">
+                時々「ピッ」と音が鳴ります。<br>
+                聞こえたらすぐに <strong>スペースキー</strong> を押してください。
+            </p>
+
+            <button id="stopBtn" class="btn-secondary">終了する</button>
+        </div>
+
+    </div>
+
+    <script src="training_script.js"></script>
+</body>
+</html>
