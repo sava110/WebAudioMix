@@ -2,283 +2,72 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>聴覚実験（キャリブレーション付）</title>
-    <style>
-        body { font-family: "Helvetica Neue", Arial, sans-serif; padding: 20px; max-width: 700px; margin: 0 auto; text-align: center; color: #333; }
-        h2 { border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-        .phase-box { border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin: 20px 0; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .hidden { display: none; }
-        button { padding: 15px 30px; font-size: 18px; cursor: pointer; margin: 10px; border-radius: 5px; border: 1px solid #999; }
-        button.primary { background-color: #007bff; color: white; border: none; }
-        button.reaction { background-color: #dc3545; color: white; border: none; width: 80%; font-size: 24px; font-weight: bold; }
-        .instruction { font-size: 18px; line-height: 1.6; text-align: left; margin-bottom: 20px; }
-        .status-bar { padding: 10px; background: #e9ecef; margin-bottom: 15px; font-weight: bold; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聴覚実験アプリ (Multi-Frequency)</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h2>聴覚実験Webアプリ</h2>
+    <div class="container">
+        <h2>聴覚マスキング実験</h2>
 
-    <div id="step0" class="phase-box">
-        <h3>STEP 0: 準備</h3>
-        <p class="instruction">
-            実験で使用する「環境音（換気扇など）」のファイルを選択してください。<br>
-            ※補聴器はいつもの設定で装着してください。
-        </p>
-        <input type="file" id="noiseInput" accept="audio/*">
+        <div id="step0" class="card">
+            <h3>STEP 0: 音源の準備</h3>
+            <p>実験に使用する音声ファイルを選択してください。</p>
+
+            <div class="file-group">
+                <label>1. 調整用BGM (mp3等):</label>
+                <input type="file" id="bgmInput" accept="audio/*">
+                <div class="note">※普段聞く音楽やフリー素材のBGMなど</div>
+            </div>
+
+            <div class="file-group">
+                <label>2. 環境音ノイズ (mp3等):</label>
+                <input type="file" id="noiseInput" accept="audio/*">
+                <div class="note">※換気扇や調理音など</div>
+            </div>
+
+            <button id="step0Btn" disabled>次へ進む</button>
+        </div>
+
+        <div id="step1" class="card hidden">
+            <h3>STEP 1: 音量の調整</h3>
+            <p>再生ボタンを押すと音楽が流れます。<br>
+            <strong>PC本体の音量</strong>を操作して、「普段音楽を聴くとき」または「テレビを見るときの快適な音量」に合わせてください。</p>
+
+            <button id="playBgmBtn">音楽 再生/停止</button>
+            <br><br>
+            <button id="step1NextBtn" class="primary-btn">調整完了（次へ）</button>
+        </div>
+
+        <div id="experimentStep" class="card hidden">
+            <h3 id="expTitle">STEP 2: 静寂時検査</h3>
+            <p id="expInstruction">
+                まずは「静かな状態」で検査します。<br>
+                開始ボタンを押すと、数秒後に音が聞こえてきます。<br>
+                <strong>「聞こえた！」と思ったら、スペースキー（またはボタン）を押してください。</strong>
+            </p>
+
+            <div class="status-box" id="statusBox">待機中</div>
+            <div class="progress-info">
+                現在の周波数: <span id="currentFreqDisplay">---</span> Hz
+                (<span id="progressDisplay">1/2</span>)
+            </div>
+
+            <button id="startTestBtn" class="primary-btn">検査開始</button>
+            <button id="reactionBtn" class="reaction-btn hidden">聞こえた！ (SPACE)</button>
+        </div>
+
+        <div id="step4" class="card hidden">
+            <h3>実験終了</h3>
+            <p>お疲れ様でした。結果が出力されました。</p>
+            <textarea id="resultArea" readonly></textarea>
+            <div class="btn-area">
+                <button id="downloadBtn" class="primary-btn">CSVをダウンロード</button>
+            </div>
+        </div>
     </div>
 
-    <div id="step1" class="phase-box hidden">
-        <h3>STEP 1: 音量の調整</h3>
-        <p class="instruction">
-            ボタンを押すと「ザァー」という音が流れます。<br>
-            <strong>PCの音量ボタン</strong>を操作して、<br>
-            「うるさすぎず、普段の生活音と同じくらい」に調整してください。<br>
-            調整が終わったら「次へ」を押してください。
-        </p>
-        <button id="testNoiseBtn">音出し確認</button>
-        <button id="step1NextBtn" class="primary" disabled>次へ</button>
-    </div>
-
-    <div id="step2" class="phase-box hidden">
-        <h3>STEP 2: 聞こえのチェック</h3>
-        <p class="instruction">
-            まずは「静かな状態」で、音がどれくらい小さくても聞こえるか確認します。<br>
-            「開始」を押すと、数秒後に音が徐々に大きくなります。<br>
-            <strong>「聞こえた！」と思ったらすぐにボタン（またはスペースキー）を押してください。</strong>
-        </p>
-        <div class="status-bar" id="step2Status">待機中</div>
-        <button id="step2StartBtn" class="primary">チェック開始</button>
-        <button id="step2ReactionBtn" class="reaction hidden">聞こえた！</button>
-    </div>
-
-    <div id="step3" class="phase-box hidden">
-        <h3>STEP 3: 環境音の中での実験</h3>
-        <p class="instruction">
-            次は「換気扇の音」が流れた状態で同じことを行います。<br>
-            音が混ざって聞こえにくくなりますが、集中して聞いてください。
-        </p>
-        <div class="status-bar" id="step3Status">待機中</div>
-        <button id="step3StartBtn" class="primary">実験開始</button>
-        <button id="step3ReactionBtn" class="reaction hidden">聞こえた！</button>
-    </div>
-
-    <div id="step4" class="phase-box hidden">
-        <h3>実験終了</h3>
-        <p>ご協力ありがとうございました。</p>
-        <textarea id="resultArea" style="width:100%; height:150px;"></textarea>
-        <br>
-        <button onclick="downloadCSV()" class="primary">結果を保存 (CSV)</button>
-    </div>
-
-    <script>
-        // --- Web Audio API 変数 ---
-        let audioCtx;
-        let noiseBuffer = null;
-        let noiseSource = null;
-        let noiseGain = null;
-        let signalOscillator = null;
-        let signalGain = null;
-
-        // --- 実験ステータス管理 ---
-        let baseThreshold = 0; // 静寂時の閾値 (基準値)
-        let noiseThreshold = 0; // ノイズ下の閾値
-        let rampTimer = null;
-        let waitTimer = null;
-        let currentVol = 0;
-
-        // --- DOM要素 ---
-        const steps = [
-            document.getElementById('step0'),
-            document.getElementById('step1'),
-            document.getElementById('step2'),
-            document.getElementById('step3'),
-            document.getElementById('step4')
-        ];
-
-        // 画面遷移ヘルパー
-        function showStep(index) {
-            steps.forEach((el, i) => {
-                el.classList.toggle('hidden', i !== index);
-            });
-        }
-
-        // Initialize AudioContext
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        // ==========================================
-        // STEP 0: ファイル読み込み
-        // ==========================================
-        document.getElementById('noiseInput').addEventListener('change', async (e) => {
-            initAudio();
-            const file = e.target.files[0];
-            if (!file) return;
-            const arrayBuffer = await file.arrayBuffer();
-            noiseBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-            showStep(1); // 次へ
-        });
-
-        // ==========================================
-        // STEP 1: 音量調整 (MCL)
-        // ==========================================
-        let isTestNoisePlaying = false;
-        document.getElementById('testNoiseBtn').addEventListener('click', () => {
-            initAudio();
-            if (isTestNoisePlaying) {
-                // 停止
-                if (noiseSource) noiseSource.stop();
-                isTestNoisePlaying = false;
-                document.getElementById('testNoiseBtn').textContent = "音出し確認";
-                document.getElementById('step1NextBtn').disabled = false;
-            } else {
-                // 再生 (Pink Noiseなどを生成してもよいが、ここでは読み込んだ環境音を使用)
-                playNoiseLoop(0.5); // 音量は仮で0.5
-                isTestNoisePlaying = true;
-                document.getElementById('testNoiseBtn').textContent = "音を止める";
-            }
-        });
-
-        document.getElementById('step1NextBtn').addEventListener('click', () => {
-            if (noiseSource) noiseSource.stop();
-            isTestNoisePlaying = false;
-            showStep(2);
-        });
-
-        // ==========================================
-        // STEP 2: 静寂時検査
-        // ==========================================
-        document.getElementById('step2StartBtn').addEventListener('click', () => {
-            startThresholdTest(false, 'step2');
-        });
-
-        document.getElementById('step2ReactionBtn').addEventListener('click', () => {
-            baseThreshold = stopThresholdTest();
-            // ログ記録は後回し
-            showStep(3);
-        });
-
-        // ==========================================
-        // STEP 3: ノイズ下検査
-        // ==========================================
-        document.getElementById('step3StartBtn').addEventListener('click', () => {
-            startThresholdTest(true, 'step3');
-        });
-
-        document.getElementById('step3ReactionBtn').addEventListener('click', () => {
-            noiseThreshold = stopThresholdTest();
-            if(noiseSource) noiseSource.stop(); // ノイズも止める
-            finishExperiment();
-        });
-
-        // ==========================================
-        // 共通関数: 閾値測定ロジック
-        // ==========================================
-        function startThresholdTest(withNoise, stepId) {
-            initAudio();
-            const startBtn = document.getElementById(stepId + 'StartBtn');
-            const reactBtn = document.getElementById(stepId + 'ReactionBtn');
-            const statusLabel = document.getElementById(stepId + 'Status');
-
-            startBtn.classList.add('hidden');
-            reactBtn.classList.remove('hidden');
-            statusLabel.textContent = "待機中... (音に注意)";
-            statusLabel.style.background = "#fff3cd";
-
-            // ノイズが必要なら再生
-            if (withNoise) {
-                playNoiseLoop(0.5); // 音量は固定(Step1でPC側調整済み前提)
-            }
-
-            // 2〜4秒のランダム待機後に音を開始
-            const waitTime = 2000 + Math.random() * 2000;
-
-            waitTimer = setTimeout(() => {
-                statusLabel.textContent = "測定中...";
-                statusLabel.style.background = "#d4edda";
-
-                // シグナル音作成 (1000Hz 検査用)
-                // ※本来は本番と同じ周波数を使うべきですが、まずは基礎データとして1000Hz
-                signalOscillator = audioCtx.createOscillator();
-                signalOscillator.type = 'sine';
-                signalOscillator.frequency.value = 1000; // 検査用周波数
-
-                signalGain = audioCtx.createGain();
-                signalGain.gain.value = 0;
-                currentVol = 0;
-
-                signalOscillator.connect(signalGain).connect(audioCtx.destination);
-                signalOscillator.start();
-
-                // 音量上昇 (Ramp)
-                rampTimer = setInterval(() => {
-                    currentVol += 0.0005; // ゆっくり上げる
-                    if(currentVol > 1.0) currentVol = 1.0;
-                    signalGain.gain.value = currentVol;
-                }, 20); // 20ms更新
-
-            }, waitTime);
-        }
-
-        function stopThresholdTest() {
-            clearTimeout(waitTimer);
-            clearInterval(rampTimer);
-            if(signalOscillator) signalOscillator.stop();
-            return currentVol; // その時のGain値を返す
-        }
-
-        function playNoiseLoop(vol) {
-            if(noiseSource) try{ noiseSource.stop() }catch(e){}
-            noiseSource = audioCtx.createBufferSource();
-            noiseSource.buffer = noiseBuffer;
-            noiseSource.loop = true;
-            noiseGain = audioCtx.createGain();
-            noiseGain.gain.value = vol;
-            noiseSource.connect(noiseGain).connect(audioCtx.destination);
-            noiseSource.start();
-        }
-
-        // ==========================================
-        // 終了処理とCSV出力
-        // ==========================================
-        function finishExperiment() {
-            showStep(4);
-            const resultText =
-                `静寂時閾値(Base): ${baseThreshold.toFixed(5)}\n` +
-                `ノイズ下閾値(Masked): ${noiseThreshold.toFixed(5)}\n` +
-                `マスキング量(Difference): ${(noiseThreshold - baseThreshold).toFixed(5)}\n`;
-
-            document.getElementById('resultArea').value = resultText;
-        }
-
-        function downloadCSV() {
-            // ユーザー情報などをヘッダーに入れると良い
-            let csv = "Condition,GainValue\n";
-            csv += `Base_Threshold,${baseThreshold.toFixed(6)}\n`;
-            csv += `Noise_Threshold,${noiseThreshold.toFixed(6)}\n`;
-            csv += `Masking_Amount,${(noiseThreshold - baseThreshold).toFixed(6)}\n`;
-
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "hearing_experiment_data.csv";
-            a.click();
-        }
-
-        // スペースキー対応
-        document.body.onkeydown = (e) => {
-            if(e.code === 'Space') {
-                if(!document.getElementById('step2').classList.contains('hidden')) {
-                    document.getElementById('step2ReactionBtn').click();
-                }
-                if(!document.getElementById('step3').classList.contains('hidden')) {
-                    document.getElementById('step3ReactionBtn').click();
-                }
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
