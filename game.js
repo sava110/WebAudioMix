@@ -1,5 +1,5 @@
 // ==========================================
-// 単語リスト (提供されたもの)
+// 単語リスト
 // ==========================================
 const WORD_LIST = [
     { romaji: 'atatakaiharunohi', jp: 'あたたかい春の日' },
@@ -103,7 +103,8 @@ window.onload = () => {
         els.dispBaseThreshold.textContent = baseThreshold.toFixed(4);
     } else {
         els.limitDisplay.textContent = "未測定 (デフォルト: 0.05)";
-        alert("注意：測定データが見つかりません。デフォルト値を使用します。先にmeasure.htmlを実行することをお勧めします。");
+        // 初回などでデータがない場合のアラートは鬱陶しいかもしれないので削除、または控えめに
+        console.log("No measurement data found. Using default.");
     }
 };
 
@@ -134,7 +135,18 @@ function startGame() {
     els.gamePanel.classList.remove('hidden');
 
     isGameRunning = true;
-    currentLevelVol = 0.5;
+
+    // --------------------------------------------------
+    // 【修正箇所】開始音量を「Limitの2倍」に設定
+    // --------------------------------------------------
+    currentLevelVol = baseThreshold * 2;
+
+    // もし2倍しても1.0を超える場合は1.0で止める
+    if (currentLevelVol > 1.0) currentLevelVol = 1.0;
+
+    // 万が一 Limit が0だった場合の安全策 (最低0.01から開始)
+    if (currentLevelVol <= 0) currentLevelVol = 0.01;
+
     hearingStreak = 0;
     typingScore = 0;
     updateStats();
@@ -246,7 +258,7 @@ function handleHearingResult(success) {
         fb.classList.add("fb-good");
         hearingStreak++;
 
-        // 難易度調整 (ただしBaseThreshold以下にはしない)
+        // 難易度調整 (BaseThreshold以下にはしない)
         if (hearingStreak >= 2) {
             currentLevelVol -= 0.05;
             if (currentLevelVol < baseThreshold) currentLevelVol = baseThreshold;
