@@ -137,9 +137,9 @@ function startGame() {
     isGameRunning = true;
 
     // --------------------------------------------------
-    // 【修正箇所】開始音量を「Limitの2倍」に設定
+    // 【修正箇所】開始音量を「Limitの3倍」に設定
     // --------------------------------------------------
-    currentLevelVol = baseThreshold * 2;
+    currentLevelVol = baseThreshold * 3;
 
     // もし2倍しても1.0を超える場合は1.0で止める
     if (currentLevelVol > 1.0) currentLevelVol = 1.0;
