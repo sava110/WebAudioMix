@@ -11,20 +11,34 @@
             <h2>Step 1: 基準聴力の測定</h2>
         </header>
 
-        <div class="panel">
-            <h3>静寂時閾値の測定</h3>
+        <div id="loadingPanel" class="panel">
+            <h3>準備中...</h3>
+            <p>音声ファイルを読み込んでいます。</p>
+        </div>
+
+        <div id="volumePanel" class="panel hidden">
+            <h3>1. 音量の調整</h3>
             <p>
-                ゲームを始める前に、あなたの「聞こえの基準（閾値）」を測定します。<br>
-                <strong>部屋を静かにし、いつもの音量設定で開始してください。</strong>
+                下のボタンを押すと<strong>音楽</strong>が流れます。<br>
+                普段PCを使っている快適な音量（大きすぎず、小さすぎず）に設定してください。
             </p>
+            <div class="status-box" id="bgmStatus">停止中</div>
+            <button id="btnToggleBgm" class="btn-primary">音楽を再生</button>
+            <br><br>
+            <button id="btnGoToMeasure" class="btn-primary" disabled>音量OK（測定へ進む）</button>
+        </div>
+
+        <div id="measurePanel" class="panel hidden">
+            <h3>2. 静寂時閾値の測定</h3>
             <p>
+                音楽が止まります。<br>
                 開始すると、無音から徐々に「ピー」という音が大きくなります。<br>
                 聞こえ始めたら、すぐに<strong>スペースキー</strong>を押してください。
             </p>
 
             <div class="status-box" id="statusBox">待機中</div>
 
-            <button id="btnStart" class="btn-primary">測定開始</button>
+            <button id="btnStartMeasure" class="btn-primary">測定開始</button>
         </div>
 
         <div id="resultPanel" class="panel hidden">
