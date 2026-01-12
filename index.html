@@ -2,72 +2,38 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>聴覚実験アプリ (Multi-Frequency)</title>
+    <title>聴力測定 (Calibration)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div class="container">
-        <h2>聴覚マスキング実験</h2>
+        <header>
+            <h2>Step 1: 基準聴力の測定</h2>
+        </header>
 
-        <div id="step0" class="card">
-            <h3>STEP 0: 音源の準備</h3>
-            <p>実験に使用する音声ファイルを選択してください。</p>
-
-            <div class="file-group">
-                <label>1. 調整用BGM (mp3等):</label>
-                <input type="file" id="bgmInput" accept="audio/*">
-                <div class="note">※普段聞く音楽やフリー素材のBGMなど</div>
-            </div>
-
-            <div class="file-group">
-                <label>2. 環境音ノイズ (mp3等):</label>
-                <input type="file" id="noiseInput" accept="audio/*">
-                <div class="note">※換気扇や調理音など</div>
-            </div>
-
-            <button id="step0Btn" disabled>次へ進む</button>
-        </div>
-
-        <div id="step1" class="card hidden">
-            <h3>STEP 1: 音量の調整</h3>
-            <p>再生ボタンを押すと音楽が流れます。<br>
-            <strong>PC本体の音量</strong>を操作して、「普段音楽を聴くとき」または「テレビを見るときの快適な音量」に合わせてください。</p>
-
-            <button id="playBgmBtn">音楽 再生/停止</button>
-            <br><br>
-            <button id="step1NextBtn" class="primary-btn">調整完了（次へ）</button>
-        </div>
-
-        <div id="experimentStep" class="card hidden">
-            <h3 id="expTitle">STEP 2: 静寂時検査</h3>
-            <p id="expInstruction">
-                まずは「静かな状態」で検査します。<br>
-                開始ボタンを押すと、数秒後に音が聞こえてきます。<br>
-                <strong>「聞こえた！」と思ったら、スペースキー（またはボタン）を押してください。</strong>
+        <div class="panel">
+            <h3>静寂時閾値の測定</h3>
+            <p>
+                ゲームを始める前に、あなたの「聞こえの基準（閾値）」を測定します。<br>
+                <strong>部屋を静かにし、いつもの音量設定で開始してください。</strong>
+            </p>
+            <p>
+                開始すると、無音から徐々に「ピー」という音が大きくなります。<br>
+                聞こえ始めたら、すぐに<strong>スペースキー</strong>を押してください。
             </p>
 
             <div class="status-box" id="statusBox">待機中</div>
-            <div class="progress-info">
-                現在の周波数: <span id="currentFreqDisplay">---</span> Hz
-                (<span id="progressDisplay">1/2</span>)
-            </div>
 
-            <button id="startTestBtn" class="primary-btn">検査開始</button>
-            <button id="reactionBtn" class="reaction-btn hidden">聞こえた！ (SPACE)</button>
+            <button id="btnStart" class="btn-primary">測定開始</button>
         </div>
 
-        <div id="step4" class="card hidden">
-            <h3>実験終了</h3>
-            <p>お疲れ様でした。結果が出力されました。</p>
-            <textarea id="resultArea" readonly></textarea>
-            <div class="btn-area">
-                <button id="downloadBtn" class="primary-btn">CSVをダウンロード</button>
-            </div>
+        <div id="resultPanel" class="panel hidden">
+            <h3>測定完了</h3>
+            <p>あなたの閾値: <strong id="resultValue" style="font-size:1.5em; color:#f1c40f;">---</strong></p>
+            <p>このデータを保存しました。次のページでトレーニングを開始してください。</p>
+            <button onclick="location.href='game.html'" class="btn-primary">トレーニングへ進む</button>
         </div>
     </div>
-
-    <script src="script.js"></script>
+    <script src="measure.js"></script>
 </body>
 </html>
