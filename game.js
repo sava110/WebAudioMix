@@ -49,13 +49,12 @@ const TARGET_TYPE = 'sawtooth';
 const SOUND_DURATION = 0.5;
 const RESPONSE_WINDOW = 2000;
 
-// 変数定義
+// 変数
 let audioCtx;
 let noiseBuffer = null;
 let noiseSource = null;
 
-// 設定値（測定ページから取得）
-let baseThreshold = 0.05; // デフォルト値
+let baseThreshold = 0.05;
 
 // ゲーム状態
 let currentLevelVol = 0.5;
@@ -63,12 +62,17 @@ let hearingStreak = 0;
 let typingScore = 0;
 let isGameRunning = false;
 let isWaitingForResponse = false;
+let startTime = 0; // ゲーム開始時刻
+
+// 結果記録用
+let minSuccessfulVol = null; // 聞き取れた最小の音量
+let totalHits = 0;           // 正解数
 
 // タイマー
 let hearingTimer = null;
 let reactionTimeout = null;
 
-// タイピング状態
+// タイピング
 let currentWordObj = null;
 let charIndex = 0;
 
@@ -76,9 +80,12 @@ let charIndex = 0;
 const els = {
     setupPanel: document.getElementById('setupPanel'),
     gamePanel: document.getElementById('gamePanel'),
+    resultPanel: document.getElementById('resultPanel'),
+
     noiseInput: document.getElementById('noiseInput'),
     btnStart: document.getElementById('btnStart'),
     btnStop: document.getElementById('btnStop'),
+    btnDownloadCsv: document.getElementById('btnDownloadCsv'),
 
     limitDisplay: document.getElementById('limitDisplay'),
     dispBaseThreshold: document.getElementById('dispBaseThreshold'),
@@ -87,14 +94,19 @@ const els = {
 
     romajiDisplay: document.getElementById('romajiDisplay'),
     japaneseDisplay: document.getElementById('japaneseDisplay'),
-    hearingFeedback: document.getElementById('hearingFeedback')
+    hearingFeedback: document.getElementById('hearingFeedback'),
+
+    // 結果表示用
+    resBase: document.getElementById('resBase'),
+    resTrain: document.getElementById('resTrain'),
+    resDiff: document.getElementById('resDiff'),
+    resScore: document.getElementById('resScore'),
+    resHits: document.getElementById('resHits')
 };
 
 // ==========================================
-// 初期化プロセス
+// 初期化
 // ==========================================
-
-// 1. 測定データのロード
 window.onload = () => {
     const saved = localStorage.getItem('userBaseThreshold');
     if (saved) {
@@ -103,12 +115,9 @@ window.onload = () => {
         els.dispBaseThreshold.textContent = baseThreshold.toFixed(4);
     } else {
         els.limitDisplay.textContent = "未測定 (デフォルト: 0.05)";
-        // 初回などでデータがない場合のアラートは鬱陶しいかもしれないので削除、または控えめに
-        console.log("No measurement data found. Using default.");
     }
 };
 
-// 2. 音声エンジン初期化 & ファイル読込
 function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -118,7 +127,6 @@ els.noiseInput.addEventListener('change', async (e) => {
     initAudio();
     const file = e.target.files[0];
     if (!file) return;
-
     els.btnStart.textContent = "読み込み中...";
     const arrayBuffer = await file.arrayBuffer();
     noiseBuffer = await audioCtx.decodeAudioData(arrayBuffer);
@@ -126,44 +134,37 @@ els.noiseInput.addEventListener('change', async (e) => {
     els.btnStart.disabled = false;
 });
 
-// 3. ゲーム開始・終了
 els.btnStart.addEventListener('click', startGame);
-els.btnStop.addEventListener('click', stopGame);
+els.btnStop.addEventListener('click', () => finishGame(false)); // 中断は失敗扱いではないが、ゲームオーバー処理へ
 
+// ==========================================
+// ゲームロジック
+// ==========================================
 function startGame() {
     els.setupPanel.classList.add('hidden');
     els.gamePanel.classList.remove('hidden');
+    els.resultPanel.classList.add('hidden');
 
     isGameRunning = true;
+    startTime = Date.now();
 
-    // --------------------------------------------------
-    // 【修正箇所】開始音量を「Limitの3倍」に設定
-    // --------------------------------------------------
+    // ---------------------------------------------
+    // 【修正】初期値は Limit の 3倍
+    // ---------------------------------------------
     currentLevelVol = baseThreshold * 3;
-
-    // もし2倍しても1.0を超える場合は1.0で止める
     if (currentLevelVol > 1.0) currentLevelVol = 1.0;
-
-    // 万が一 Limit が0だった場合の安全策 (最低0.01から開始)
     if (currentLevelVol <= 0) currentLevelVol = 0.01;
 
+    // 変数リセット
     hearingStreak = 0;
     typingScore = 0;
-    updateStats();
+    totalHits = 0;
+    minSuccessfulVol = null; // まだ成功していない
 
+    updateStats();
     playNoiseLoop();
     nextWord();
     scheduleNextSound();
-}
-
-function stopGame() {
-    isGameRunning = false;
-    clearTimeout(hearingTimer);
-    clearTimeout(reactionTimeout);
-    if(noiseSource) noiseSource.stop();
-
-    els.gamePanel.classList.add('hidden');
-    els.setupPanel.classList.remove('hidden');
 }
 
 function playNoiseLoop() {
@@ -172,55 +173,14 @@ function playNoiseLoop() {
     noiseSource.buffer = noiseBuffer;
     noiseSource.loop = true;
     const gain = audioCtx.createGain();
-    gain.gain.value = 0.5; // 背景ノイズ音量
+    gain.gain.value = 0.5;
     noiseSource.connect(gain).connect(audioCtx.destination);
     noiseSource.start();
 }
 
-// ==========================================
-// タイピングロジック
-// ==========================================
-function nextWord() {
-    currentWordObj = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
-    charIndex = 0;
-    renderWord();
-}
-
-function renderWord() {
-    const romaji = currentWordObj.romaji;
-    const typedPart = romaji.substring(0, charIndex);
-    const untypedPart = romaji.substring(charIndex);
-
-    els.romajiDisplay.innerHTML =
-        `<span class="typed-char">${typedPart}</span>` +
-        `<span class="untyped-char">${untypedPart}</span>`;
-
-    els.japaneseDisplay.textContent = currentWordObj.jp;
-}
-
-function checkTyping(key) {
-    if (!isGameRunning) return;
-
-    const targetChar = currentWordObj.romaji[charIndex];
-    if (key.toLowerCase() === targetChar) {
-        charIndex++;
-        typingScore += 10;
-        renderWord();
-        updateStats();
-
-        if (charIndex >= currentWordObj.romaji.length) {
-            typingScore += 50;
-            setTimeout(nextWord, 100);
-        }
-    }
-}
-
-// ==========================================
-// 聴覚トレーニングロジック
-// ==========================================
 function scheduleNextSound() {
     if (!isGameRunning) return;
-    const delay = Math.random() * 5000 + 3000;
+    const delay = Math.random() * 4000 + 2000; // 2~6秒後
     hearingTimer = setTimeout(playSoundEffect, delay);
 }
 
@@ -239,13 +199,17 @@ function playSoundEffect() {
 
     isWaitingForResponse = true;
 
+    // タイムアウト設定（聞き逃し判定）
     reactionTimeout = setTimeout(() => {
         if (isWaitingForResponse) {
-            handleHearingResult(false);
+            handleHearingResult(false); // タイムアウト＝聞き逃し
         }
     }, RESPONSE_WINDOW);
 }
 
+// ---------------------------------------------
+// 【重要】判定ロジック（サドンデス）
+// ---------------------------------------------
 function handleHearingResult(success) {
     isWaitingForResponse = false;
     clearTimeout(reactionTimeout);
@@ -254,32 +218,128 @@ function handleHearingResult(success) {
     fb.className = "feedback-visible";
 
     if (success) {
+        // --- 正解時 ---
         fb.textContent = "HEARING OK!";
         fb.classList.add("fb-good");
+
+        totalHits++;
         hearingStreak++;
 
-        // 難易度調整 (BaseThreshold以下にはしない)
-        if (hearingStreak >= 2) {
+        // 成功した最小音量を記録
+        if (minSuccessfulVol === null || currentLevelVol < minSuccessfulVol) {
+            minSuccessfulVol = currentLevelVol;
+        }
+
+        // 次のレベルへ（音を小さく）
+        // ※BaseThresholdより下にはしない
+        if (hearingStreak >= 1) { // 毎回下げる設定（必要なら2回ごとなどに変更可）
             currentLevelVol -= 0.05;
             if (currentLevelVol < baseThreshold) currentLevelVol = baseThreshold;
-            hearingStreak = 0;
         }
-    } else {
-        fb.textContent = "MISS...";
-        fb.classList.add("fb-miss");
-        hearingStreak = 0;
 
-        currentLevelVol += 0.05;
-        if (currentLevelVol > 1.0) currentLevelVol = 1.0;
+        updateStats();
+
+        // フィードバック消去 & 次の音へ
+        setTimeout(() => {
+            fb.classList.remove("feedback-visible", "fb-good");
+        }, 1000);
+        scheduleNextSound();
+
+    } else {
+        // --- 失敗時（即終了） ---
+        fb.textContent = "GAME OVER...";
+        fb.classList.add("fb-miss");
+
+        // 少し待ってから結果画面へ
+        setTimeout(() => {
+            finishGame(true);
+        }, 1500);
+    }
+}
+
+// ==========================================
+// ゲーム終了 & 結果計算
+// ==========================================
+function finishGame(isGameOver) {
+    isGameRunning = false;
+    clearTimeout(hearingTimer);
+    clearTimeout(reactionTimeout);
+    if(noiseSource) noiseSource.stop();
+
+    els.gamePanel.classList.add('hidden');
+    els.resultPanel.classList.remove('hidden');
+
+    // --- 結果算出 ---
+    const finalTrainVol = (minSuccessfulVol !== null) ? minSuccessfulVol : "記録なし";
+
+    // 差分計算 (記録がある場合のみ)
+    let diff = "---";
+    if (typeof finalTrainVol === 'number') {
+        // 小数点計算の誤差を避けるため少し丸める
+        const rawDiff = finalTrainVol - baseThreshold;
+        diff = rawDiff.toFixed(4);
     }
 
+    // 画面表示
+    els.resBase.textContent = baseThreshold.toFixed(4);
+    els.resTrain.textContent = (typeof finalTrainVol === 'number') ? finalTrainVol.toFixed(4) : finalTrainVol;
+    els.resDiff.textContent = (diff > 0) ? `+${diff}` : diff;
+    els.resScore.textContent = typingScore;
+    els.resHits.textContent = totalHits;
+
+    // CSVダウンロード準備
+    setupCsvDownload(finalTrainVol, diff);
+}
+
+function setupCsvDownload(trainVol, diff) {
+    els.btnDownloadCsv.onclick = () => {
+        const timestamp = new Date().toLocaleString();
+        const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+        // CSVヘッダーとデータ
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Timestamp,Base_Threshold,Training_Threshold,Masking_Amount(Diff),Typing_Score,Total_Hits,Duration(sec)\n";
+        csvContent += `${timestamp},${baseThreshold},${trainVol},${diff},${typingScore},${totalHits},${duration}\n`;
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "training_result_suddendeath.csv");
+        document.body.appendChild(link);
+        link.click();
+    };
+}
+
+// ==========================================
+// タイピング (既存のまま)
+// ==========================================
+function nextWord() {
+    currentWordObj = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+    charIndex = 0;
+    renderWord();
+}
+
+function renderWord() {
+    const romaji = currentWordObj.romaji;
+    const typedPart = romaji.substring(0, charIndex);
+    const untypedPart = romaji.substring(charIndex);
+    els.romajiDisplay.innerHTML = `<span class="typed-char">${typedPart}</span><span class="untyped-char">${untypedPart}</span>`;
+    els.japaneseDisplay.textContent = currentWordObj.jp;
+}
+
+function checkTyping(key) {
+    if (!isGameRunning) return;
+    const targetChar = currentWordObj.romaji[charIndex];
+    if (key.toLowerCase() === targetChar) {
+        charIndex++;
+        typingScore += 10;
+        renderWord();
+        if (charIndex >= currentWordObj.romaji.length) {
+            typingScore += 50;
+            setTimeout(nextWord, 100);
+        }
+    }
     updateStats();
-
-    setTimeout(() => {
-        fb.classList.remove("feedback-visible", "fb-good", "fb-miss");
-    }, 1000);
-
-    scheduleNextSound();
 }
 
 function updateStats() {
@@ -293,18 +353,18 @@ function updateStats() {
 document.addEventListener('keydown', (e) => {
     if (!isGameRunning) return;
 
-    // スペースキー (聴覚)
     if (e.code === 'Space') {
         e.preventDefault();
         if (isWaitingForResponse) {
             handleHearingResult(true);
         } else {
-            console.log("お手つき");
+            // お手つき -> サドンデスなので即終了
+            console.log("お手つき (即終了)");
+            handleHearingResult(false);
         }
         return;
     }
 
-    // 文字キー (タイピング)
     if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
         checkTyping(e.key);
     }

@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Dual Task Training</title>
+    <title>Dual Task Training (Sudden Death)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,8 +17,11 @@
             <p>2. 環境音（換気扇など）のファイルを選択してください。</p>
             <input type="file" id="noiseInput" accept="audio/*">
             <br><br>
-            <p>スタートすると、不定期に「ピピッ」と音が鳴ります。<br>
-               タイピングしながら、音が聞こえたら<strong>スペースキー</strong>を押してください。</p>
+            <p class="instruction">
+                <strong>【ルール: サドンデス】</strong><br>
+                一度でも聞き逃すと即終了です。<br>
+                スタート音量はLimitの<strong>3倍</strong>です。
+            </p>
             <button id="btnStart" class="btn-primary" disabled>ゲームスタート</button>
         </div>
 
@@ -30,7 +33,7 @@
                 </div>
                 <div class="stat-box">
                     <span class="label">Current Level</span>
-                    <span class="value" id="dispCurrentVol">0.50</span>
+                    <span class="value" id="dispCurrentVol">---</span>
                 </div>
                 <div class="stat-box">
                     <span class="label">Score</span>
@@ -45,8 +48,29 @@
 
             <div id="hearingFeedback" class="feedback-hidden">Good!</div>
 
-            <button id="btnStop" class="btn-secondary">終了する</button>
+            <button id="btnStop" class="btn-secondary">中断する</button>
         </div>
+
+        <div id="resultPanel" class="panel hidden">
+            <h3>トレーニング結果</h3>
+
+            <div style="text-align: left; background: #22303f; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <p>静寂時の聞こえ (Base): <strong id="resBase" style="color:#f1c40f">---</strong></p>
+                <p>今回の限界 (Training): <strong id="resTrain" style="color:#f1c40f">---</strong></p>
+                <hr style="border-color: #555;">
+                <p><strong>差分 (Masking Amount): <span id="resDiff" style="color:#e74c3c; font-size:1.4em;">---</span></strong></p>
+                <p style="font-size: 0.9em; color: #bdc3c7;">※ この数値が大きいほど、ノイズと作業の影響を受けています。</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <div>タイピングスコア: <span id="resScore">0</span></div>
+                <div>正解回数: <span id="resHits">0</span>回</div>
+            </div>
+
+            <button id="btnDownloadCsv" class="btn-primary">CSV保存</button>
+            <button onclick="location.reload()" class="btn-secondary">最初に戻る</button>
+        </div>
+
     </div>
     <script src="game.js"></script>
 </body>
