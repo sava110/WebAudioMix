@@ -3,8 +3,8 @@
 // ※HTMLと同じ場所にある 'assets' フォルダ内を想定
 // ==========================================
 const AUDIO_PATHS = {
-    bgm: 'assets/bgm.mp3',   // 音楽ファイル名に合わせて変更してください
-    noise: 'assets/fan.mp3'  // 換気扇ファイル名（今回は測定では使いませんが読み込みます）
+    bgm: 'assets/bgm/bgm.mp3',   // 音楽ファイル名に合わせて変更してください
+    noise: 'assets/noise/fan.mp3'  // 換気扇ファイル名（今回は測定では使いませんが読み込みます）
 };
 
 const TARGET_FREQ = 1000;

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Step 0: Calibration</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h2>Step 0: 音量キャリブレーション</h2>
+        </header>
+
+        <div class="panel">
+            <h3>60dB 調整モード</h3>
+            <p>
+                スマートフォンの騒音計アプリなどを起動してください。<br>
+                下のボタンを押すと音が鳴り続けます。<br>
+                <strong>アプリの数値が「60dB」になるように、PCやスピーカーの音量を調整してください。</strong>
+            </p>
+            
+            <div id="statusBox" class="status-box">待機中</div>
+
+            <button id="btnToggleRef" class="btn-primary">基準音を再生</button>
+            <br><br>
+            <p class="instruction">調整が終わったら、音量はそのままにして「測定」へ進んでください。</p>
+            <button onclick="location.href='measure.html'" class="btn-secondary">Step 1: 測定へ進む</button>
+        </div>
+    </div>
+    <script src="js/calibrate.js"></script>
+</body>
+</html>

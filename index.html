@@ -2,52 +2,26 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>聴力測定 (Calibration)</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Hearing Training System</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h2>Step 1: 基準聴力の測定</h2>
+            <h1>聴覚注意トレーニング</h1>
         </header>
 
-        <div id="loadingPanel" class="panel">
-            <h3>準備中...</h3>
-            <p>音声ファイルを読み込んでいます。</p>
-        </div>
-
-        <div id="volumePanel" class="panel hidden">
-            <h3>1. 音量の調整</h3>
-            <p>
-                下のボタンを押すと<strong>音楽</strong>が流れます。<br>
-                普段PCを使っている快適な音量（大きすぎず、小さすぎず）に設定してください。
-            </p>
-            <div class="status-box" id="bgmStatus">停止中</div>
-            <button id="btnToggleBgm" class="btn-primary">音楽を再生</button>
-            <br><br>
-            <button id="btnGoToMeasure" class="btn-primary" disabled>音量OK（測定へ進む）</button>
-        </div>
-
-        <div id="measurePanel" class="panel hidden">
-            <h3>2. 静寂時閾値の測定</h3>
-            <div class="status-box" id="statusBox" style="min-height: 2em; display: flex; align-items: center; justify-content: center;">
-                待機中
-            </div>
-
-            <div id="stepCounter" style="font-size: 6em; font-weight: bold; display: none; text-align: center; margin: 20px 0; color: #f1c40f;">
-                1
-            </div>
-
-            <button id="btnStartMeasure" class="btn-primary">測定開始</button>
-        </div>
-
-        <div id="resultPanel" class="panel hidden">
-            <h3>測定完了</h3>
-            <p>あなたの閾値: <strong id="resultValue" style="font-size:1.5em; color:#f1c40f;">---</strong></p>
-            <p>このデータを保存しました。次のページでトレーニングを開始してください。</p>
-            <button onclick="location.href='game.html'" class="btn-primary">トレーニングへ進む</button>
+        <div class="panel">
+            <button onclick="location.href='calibrate.html'" class="btn-primary" style="margin-bottom:10px;">
+                Step 0: 音量調整 (60dB設定)
+            </button>
+            <button onclick="location.href='measure.html'" class="btn-secondary" style="margin-bottom:10px;">
+                Step 1: 基準聴力の測定
+            </button>
+            <button onclick="location.href='game.html'" class="btn-secondary">
+                Step 2: トレーニング開始
+            </button>
         </div>
     </div>
-    <script src="measure.js"></script>
 </body>
 </html>

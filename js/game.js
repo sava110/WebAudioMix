@@ -1,7 +1,7 @@
 // ==========================================
 // 設定：内部ファイルパス
 // ==========================================
-const NOISE_FILE_PATH = 'assets/fan.mp3';
+const NOISE_FILE_PATH = 'assets/noise/fan.mp3';
 const TARGET_FREQ = 1000;
 const TARGET_TYPE = 'sawtooth';
 const SOUND_DURATION = 0.5;
