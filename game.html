@@ -14,9 +14,11 @@
         <div id="setupPanel" class="panel">
             <h3>トレーニング準備</h3>
             <p>1. 測定された閾値(Limit): <strong id="limitDisplay" style="color:#f1c40f;">---</strong></p>
-            <p>2. 環境音（換気扇など）のファイルを選択してください。</p>
-            <input type="file" id="noiseInput" accept="audio/*">
-            <br><br>
+            
+            <div id="loadStatus" style="margin: 20px 0; padding: 10px; background: #22303f; border-radius: 5px;">
+                環境音を読み込んでいます...
+            </div>
+
             <p class="instruction">
                 <strong>【ルール: サドンデス】</strong><br>
                 一度でも聞き逃すと即終了です。<br>

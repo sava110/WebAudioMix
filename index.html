@@ -30,13 +30,13 @@
 
         <div id="measurePanel" class="panel hidden">
             <h3>2. 静寂時閾値の測定</h3>
-            <p>
-                音楽が止まります。<br>
-                開始すると、無音から徐々に「ピー」という音が大きくなります。<br>
-                聞こえ始めたら、すぐに<strong>スペースキー</strong>を押してください。
-            </p>
+            <div class="status-box" id="statusBox" style="min-height: 2em; display: flex; align-items: center; justify-content: center;">
+                待機中
+            </div>
 
-            <div class="status-box" id="statusBox">待機中</div>
+            <div id="stepCounter" style="font-size: 6em; font-weight: bold; display: none; text-align: center; margin: 20px 0; color: #f1c40f;">
+                1
+            </div>
 
             <button id="btnStartMeasure" class="btn-primary">測定開始</button>
         </div>

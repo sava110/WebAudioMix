@@ -22,6 +22,13 @@ let rampTimer = null;
 let currentVol = 0;
 let isMeasuring = false;
 
+let currentDB = 0;       // 現在のdB
+const DB_STEP = 5;       // 5dB刻み
+const REF_DB = 60;       // 基準（最大）となるdB
+const TONE_DURATION = 0.5;  // 音が鳴る時間（秒）
+const PAUSE_DURATION = 1.0; // 休憩時間（秒）
+let isInterrupted = false; // 中断フラグ
+
 // DOM要素
 const els = {
     loadingPanel: document.getElementById('loadingPanel'),
@@ -35,7 +42,9 @@ const els = {
 
     statusBox: document.getElementById('statusBox'),
     btnStartMeasure: document.getElementById('btnStartMeasure'),
-    resultValue: document.getElementById('resultValue')
+    resultValue: document.getElementById('resultValue'),
+    elStepCounter: document.getElementById('stepCounter'),
+    stepCounter: document.getElementById('stepCounter'),
 };
 
 // ==========================================
@@ -139,63 +148,97 @@ els.btnGoToMeasure.addEventListener('click', () => {
 // ==========================================
 els.btnStartMeasure.addEventListener('click', startMeasurement);
 
-function startMeasurement() {
+async function startMeasurement() {
     if (audioCtx.state === 'suspended') audioCtx.resume();
 
     isMeasuring = true;
+    currentDB = 0; 
     els.btnStartMeasure.disabled = true;
-    els.statusBox.textContent = "シーン... (まもなく検査音が鳴ります)";
 
-    // 2秒待機後に開始
-    setTimeout(() => {
-        if(!isMeasuring) return;
+    // 測定開始時の初期表示
+    if (els.stepCounter) {
+        els.stepCounter.style.display = "block";
+        els.stepCounter.textContent = "1";
+    }
+    els.statusBox.textContent = "まもなく開始します...";
 
-        els.statusBox.textContent = "測定中... 聞こえたらSPACE!";
-        els.statusBox.style.background = "#fff3cd";
-        els.statusBox.style.color = "#333";
+    // 準備のための2秒待機
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-        measureOsc = audioCtx.createOscillator();
-        measureGain = audioCtx.createGain();
+    // ステップループ開始
+    while (isMeasuring && currentDB <= REF_DB) {
+        const stepNumber = (currentDB / DB_STEP) + 1;
+        
+        // 1. 数字を更新
+        if (els.stepCounter) {
+            els.stepCounter.textContent = stepNumber;
+        }
 
-        measureOsc.type = TARGET_TYPE;
-        measureOsc.frequency.value = TARGET_FREQ;
+        // 2. 「音が鳴っています」という表示に切り替え
+        els.statusBox.textContent = "♪ 再生中... (聞こえたらSPACE)";
+        els.statusBox.style.background = "#fff3cd"; // 少し色を変えて視認性を上げる
+        els.statusBox.style.color = "#856404";
 
-        currentVol = 0;
-        measureGain.gain.value = 0;
+        // dBをGainに変換
+        currentVol = Math.pow(10, (currentDB - REF_DB) / 20);
 
-        measureOsc.connect(measureGain).connect(audioCtx.destination);
-        measureOsc.start();
+        // --- 音を鳴らす (0.5秒) ---
+        if (!isMeasuring) break;
+        await playTone(currentVol, TONE_DURATION);
 
-        // 音量上昇 (0.0005ずつ)
-        rampTimer = setInterval(() => {
-            currentVol += 0.0005;
-            if (currentVol > 1.0) currentVol = 1.0;
-            measureGain.gain.value = currentVol;
-        }, 20);
+        // 3. 「休憩中」という表示に切り替え
+        if (!isMeasuring) break;
+        els.statusBox.textContent = "待機中...";
+        els.statusBox.style.background = "#22303f";
+        els.statusBox.style.color = "#ecf0f1";
 
-    }, 2000);
+        // --- 休憩 (1.0秒) ---
+        await new Promise(resolve => setTimeout(resolve, PAUSE_DURATION * 1000));
+
+        // 次のステップへ
+        currentDB += DB_STEP;
+    }
+}
+// 指定した音量と時間で音を鳴らす関数
+function playTone(volume, duration) {
+    return new Promise(resolve => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = TARGET_TYPE;
+        osc.frequency.value = TARGET_FREQ;
+        gain.gain.value = volume;
+
+        osc.connect(gain).connect(audioCtx.destination);
+
+        osc.start();
+        
+        // 指定時間後に停止
+        setTimeout(() => {
+            osc.stop();
+            osc.disconnect();
+            resolve(); // 終わったら次に進める
+        }, duration * 1000);
+    });
 }
 
 function finishMeasurement() {
     isMeasuring = false;
-    clearInterval(rampTimer);
-    if(measureOsc) measureOsc.stop();
+    
+    // スペースを押した瞬間の数値を保存
+    localStorage.setItem('userBaseThresholdDB', currentDB);
+    localStorage.setItem('userBaseThresholdGain', currentVol);
 
-    const threshold = currentVol;
-
-    // 結果を保存
-    localStorage.setItem('userBaseThreshold', threshold);
-
-    // 結果表示
     els.statusBox.textContent = "測定終了";
-    els.statusBox.style.background = "#22303f";
-    els.statusBox.style.color = "#ecf0f1";
+    if (els.stepCounter) {
+        els.stepCounter.style.display = "none";
+    }
 
-    els.resultValue.textContent = threshold.toFixed(4);
+    const finalStep = (currentDB / DB_STEP) + 1;
+    els.resultValue.textContent = `${currentDB} dB (Step: ${finalStep})`;
     els.measurePanel.classList.add('hidden');
     els.resultPanel.classList.remove('hidden');
 }
-
 // スペースキー判定
 document.addEventListener('keydown', (e) => {
     // 測定中のみ反応
