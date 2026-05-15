@@ -9,8 +9,12 @@ const RESPONSE_WINDOW = 2000;
 
 // dB計算用の定数
 const REF_DB = 60;       // 基準（最大）となるdB
-const START_OFFSET = 15; // 閾値から何dB上で始めるか
+const START_OFFSET = 20; // 閾値から何dB上で始めるか
 const STEP_DB = 5;       // 成功時に下げるdB
+
+let soundStartTime = 0;      // 音が鳴り始めた時刻
+let latestReactionTime = 0;  // 直近の反応時間（ms）
+let reactionTimes = [];      // 全正解試行の反応時間リスト
 
 // 単語リスト
 const WORD_LIST = [
@@ -52,6 +56,8 @@ let hearingTimer = null;
 let reactionTimeout = null;
 let currentWordObj = null;
 let charIndex = 0;
+
+let trialHistory = []; // 各試行の全データを保存する配列
 
 // DOM要素
 const els = {
@@ -166,6 +172,9 @@ function scheduleNextSound() {
     hearingTimer = setTimeout(playSoundEffect, delay);
 }
 
+// ==========================================
+// 修正：音を鳴らす関数
+// ==========================================
 function playSoundEffect() {
     if (!isGameRunning) return;
 
@@ -174,11 +183,14 @@ function playSoundEffect() {
     osc.type = TARGET_TYPE;
     osc.frequency.value = TARGET_FREQ;
     
-    // 現在のdBをGainに変換してセット
     currentLevelVol = dbToGain(currentDB);
     gain.gain.value = currentLevelVol;
 
     osc.connect(gain).connect(audioCtx.destination);
+    
+    // ★ 音が鳴る直前に高精度タイムスタンプを記録
+    soundStartTime = performance.now(); 
+    
     osc.start();
     osc.stop(audioCtx.currentTime + SOUND_DURATION);
 
@@ -188,21 +200,35 @@ function playSoundEffect() {
     }, RESPONSE_WINDOW);
 }
 
-function handleHearingResult(success) {
+// ==========================================
+// 判定ロジックの修正
+// ==========================================
+function handleHearingResult(success, reactionTime = null) {
     isWaitingForResponse = false;
     clearTimeout(reactionTimeout);
     const fb = els.hearingFeedback;
     fb.className = "feedback-visible";
 
-    if (success) {
-        fb.textContent = "HEARING OK!";
+    // 試行データのオブジェクトを作成
+    const trialRecord = {
+        trialNumber: totalHits + 1,
+        targetDB: currentDB,
+        success: success,
+        reactionTime: success ? reactionTime.toFixed(2) : "N/A",
+        typingScoreAtTime: typingScore,
+        timestamp: (performance.now() - startTime).toFixed(0) // ゲーム開始からの経過時間
+    };
+
+    if (success && reactionTime !== null) {
+        fb.innerHTML = `HEARING OK!<br><span style="font-size:0.6em;">RT: ${reactionTime.toFixed(0)}ms</span>`;
         fb.classList.add("fb-good");
+        
         totalHits++;
-
-        // 成功したdB値を記録
         minSuccessfulDB = currentDB;
+        
+        // 履歴に保存
+        trialHistory.push(trialRecord);
 
-        // 次のレベルへ：5dB下げる
         currentDB -= STEP_DB;
         if (currentDB < 0) currentDB = 0;
 
@@ -210,6 +236,10 @@ function handleHearingResult(success) {
         setTimeout(() => fb.classList.remove("feedback-visible", "fb-good"), 1000);
         scheduleNextSound();
     } else {
+        // 失敗時（聞き逃し）もデータとして記録してから終了
+        trialRecord.success = false;
+        trialHistory.push(trialRecord);
+
         fb.textContent = "GAME OVER...";
         fb.classList.add("fb-miss");
         setTimeout(() => finishGame(true), 1500);
@@ -240,16 +270,33 @@ function finishGame(isGameOver) {
     setupCsvDownload(finalTrainDB, dbDiff);
 }
 
+// ==========================================
+// CSV保存機能の修正（詳細データ版）
+// ==========================================
 function setupCsvDownload(finalDB, diff) {
     els.btnDownloadCsv.onclick = () => {
         const timestamp = new Date().toLocaleString();
+        
+        // CSVヘッダー
         let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Timestamp,Base_dB,Final_Training_dB,Diff_dB,Typing_Score,Total_Hits\n";
-        csvContent += `${timestamp},${baseThresholdDB},${finalDB},${diff},${typingScore},${totalHits}\n`;
+        
+        // 1. サマリー情報のセクション
+        csvContent += "--- Summary ---\n";
+        csvContent += "Date,Base_dB,Final_Training_dB,Diff_dB,Total_Hits,Final_Typing_Score\n";
+        csvContent += `${timestamp},${baseThresholdDB},${finalDB},${diff},${totalHits},${typingScore}\n\n`;
+
+        // 2. 試行ごとの詳細データセクション
+        csvContent += "--- Trial Details ---\n";
+        csvContent += "Trial_Number,Target_Volume(dB),Result,Reaction_Time(ms),Elapsed_Time(ms),Typing_Score\n";
+        
+        trialHistory.forEach(t => {
+            csvContent += `${t.trialNumber},${t.targetDB},${t.success ? "Success" : "Miss"},${t.reactionTime},${t.timestamp},${t.typingScoreAtTime}\n`;
+        });
+
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `result_${finalDB}dB.csv`);
+        link.setAttribute("download", `training_detail_${finalDB}dB.csv`);
         document.body.appendChild(link);
         link.click();
     };
@@ -283,12 +330,25 @@ function updateStats() {
     els.dispCurrentVol.textContent = `${currentDB} dB`;
     els.dispScore.textContent = typingScore;
 }
+
+// ==========================================
+// 修正：イベントハンドラ（スペースキー）
+// ==========================================
 document.addEventListener('keydown', (e) => {
     if (!isGameRunning) return;
     if (e.code === 'Space') {
         e.preventDefault();
-        handleHearingResult(isWaitingForResponse);
-    } else if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
+        if (isWaitingForResponse) {
+            // ★ スペースが押された瞬間の時間を計測
+            const rt = performance.now() - soundStartTime;
+            handleHearingResult(true, rt);
+        } else {
+            handleHearingResult(false); // お手つき
+        }
+        return;
+    }
+    // タイピング処理は変更なし
+    if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
         checkTyping(e.key);
     }
 });
