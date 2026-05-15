@@ -16,27 +16,15 @@
             <p>音声ファイルを読み込んでいます。</p>
         </div>
 
-        <div id="volumePanel" class="panel hidden">
-            <h3>1. 音量の調整</h3>
-            <p>
-                下のボタンを押すと<strong>音楽</strong>が流れます。<br>
-                普段PCを使っている快適な音量（大きすぎず、小さすぎず）に設定してください。
-            </p>
-            <div class="status-box" id="bgmStatus">停止中</div>
-            <button id="btnToggleBgm" class="btn-primary">音楽を再生</button>
-            <br><br>
-            <button id="btnGoToMeasure" class="btn-primary" disabled>音量OK（測定へ進む）</button>
-        </div>
-
         <div id="measurePanel" class="panel hidden">
-            <h3>2. 静寂時閾値の測定</h3>
-            <div class="status-box" id="statusBox" style="min-height: 2em; display: flex; align-items: center; justify-content: center;">
-                待機中
-            </div>
+            <h3>静寂時閾値の測定</h3>
+            <p>
+                開始すると、一定の間隔で「ピー」という音が大きくなります。<br>
+                聞こえ始めたら、すぐに<strong>スペースキー</strong>を押してください。
+            </p>
 
-            <div id="stepCounter" style="font-size: 6em; font-weight: bold; display: none; text-align: center; margin: 20px 0; color: #f1c40f;">
-                1
-            </div>
+            <div class="status-box" id="statusBox">待機中</div>
+            <div id="stepCounter" style="font-size: 6em; font-weight: bold; display: none; text-align: center; margin: 20px 0; color: #f1c40f;">1</div>
 
             <button id="btnStartMeasure" class="btn-primary">測定開始</button>
         </div>
@@ -44,8 +32,8 @@
         <div id="resultPanel" class="panel hidden">
             <h3>測定完了</h3>
             <p>あなたの閾値: <strong id="resultValue" style="font-size:1.5em; color:#f1c40f;">---</strong></p>
-            <p>このデータを保存しました。次のページでトレーニングを開始してください。</p>
-            <button onclick="location.href='game.html'" class="btn-primary">トレーニングへ進む</button>
+            <p>データを保存しました。次に進んでください。</p>
+            <button onclick="location.href='game.html'" class="btn-primary">Step 2: トレーニングへ進む</button>
         </div>
     </div>
     <script src="js/measure.js"></script>

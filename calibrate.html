@@ -12,19 +12,24 @@
         </header>
 
         <div class="panel">
-            <h3>60dB 調整モード</h3>
+            <h3>リニアリティ・チェックモード</h3>
             <p>
-                スマートフォンの騒音計アプリなどを起動してください。<br>
-                下のボタンを押すと音が鳴り続けます。<br>
-                <strong>アプリの数値が「60dB」になるように、PCやスピーカーの音量を調整してください。</strong>
+                スマートフォンの騒音計アプリなどで確認してください。<br>
+                <strong>① 60dBボタン</strong>を押し、PC音量を調整して<strong>60dB</strong>に合わせます。<br>
+                <strong>② 50dBボタン</strong>を押し、アプリの数値が<strong>50dB</strong>（±1dB以内）になるか確認してください。
             </p>
             
             <div id="statusBox" class="status-box">待機中</div>
 
-            <button id="btnToggleRef" class="btn-primary">基準音を再生</button>
-            <br><br>
-            <p class="instruction">調整が終わったら、音量はそのままにして「測定」へ進んでください。</p>
-            <button onclick="location.href='measure.html'" class="btn-secondary">Step 1: 測定へ進む</button>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+                <button id="btn60dB" class="btn-primary">60dB 再生</button>
+                <button id="btn50dB" class="btn-secondary">50dB 再生</button>
+            </div>
+            
+            <button id="btnStop" class="btn-danger" style="width: 100%; margin-bottom: 20px;">音を止める</button>
+
+            <p class="instruction">50dBが正しく計測できれば、システムの線形性は正常です。</p>
+            <button onclick="location.href='measure.html'" class="btn-primary">Step 1: 測定へ進む</button>
         </div>
     </div>
     <script src="js/calibrate.js"></script>
