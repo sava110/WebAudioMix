@@ -168,8 +168,17 @@ function playNoiseLoop() {
 
 function scheduleNextSound() {
     if (!isGameRunning) return;
-    const delay = Math.random() * 4000 + 3000;
+
+    // 3,000ms（3秒）〜 10,000ms（10秒）の間でランダムな待機時間を計算
+    // 式：Math.random() * (最大値 - 最小値) + 最小値
+    const minDelay = 3000;
+    const maxDelay = 10000;
+    const delay = Math.random() * (maxDelay - minDelay) + minDelay;
+
     hearingTimer = setTimeout(playSoundEffect, delay);
+    
+    // デバッグ用（必要に応じて）：次の音までの時間をコンソールに表示
+    console.log(`Next sound in: ${(delay / 1000).toFixed(1)} seconds`);
 }
 
 // ==========================================
@@ -201,6 +210,13 @@ function playSoundEffect() {
 }
 
 // ==========================================
+// 変数の追加・更新
+// ==========================================
+let missCount = 0;           // 失敗回数をカウント
+const MAX_MISSES = 2;        // 2回失敗で終了
+const RECOVERY_OFFSET = 10;  // 失敗時の引き上げ幅 (+10dB)
+
+// ==========================================
 // 判定ロジックの修正
 // ==========================================
 function handleHearingResult(success, reactionTime = null) {
@@ -209,40 +225,59 @@ function handleHearingResult(success, reactionTime = null) {
     const fb = els.hearingFeedback;
     fb.className = "feedback-visible";
 
-    // 試行データのオブジェクトを作成
+    // 試行データの記録
     const trialRecord = {
-        trialNumber: totalHits + 1,
+        trialNumber: trialHistory.length + 1,
         targetDB: currentDB,
         success: success,
-        reactionTime: success ? reactionTime.toFixed(2) : "N/A",
+        reactionTime: success ? reactionTime.toFixed(2) : "MISS",
         typingScoreAtTime: typingScore,
-        timestamp: (performance.now() - startTime).toFixed(0) // ゲーム開始からの経過時間
+        timestamp: (performance.now() - startTime).toFixed(0)
     };
+    trialHistory.push(trialRecord);
 
     if (success && reactionTime !== null) {
+        // --- 成功時 ---
         fb.innerHTML = `HEARING OK!<br><span style="font-size:0.6em;">RT: ${reactionTime.toFixed(0)}ms</span>`;
         fb.classList.add("fb-good");
         
         totalHits++;
         minSuccessfulDB = currentDB;
-        
-        // 履歴に保存
-        trialHistory.push(trialRecord);
 
+        // 次のレベルへ：5dB下げる
         currentDB -= STEP_DB;
         if (currentDB < 0) currentDB = 0;
 
         updateStats();
         setTimeout(() => fb.classList.remove("feedback-visible", "fb-good"), 1000);
         scheduleNextSound();
-    } else {
-        // 失敗時（聞き逃し）もデータとして記録してから終了
-        trialRecord.success = false;
-        trialHistory.push(trialRecord);
 
-        fb.textContent = "GAME OVER...";
-        fb.classList.add("fb-miss");
-        setTimeout(() => finishGame(true), 1500);
+    } else {
+        // --- 失敗時 ---
+        missCount++;
+
+        if (missCount < MAX_MISSES) {
+            // 1回目の失敗：音量を上げて継続
+            fb.innerHTML = `MISS (+10dB)<br><span style="font-size:0.6em;">残りライフ: 1</span>`;
+            fb.classList.add("fb-miss");
+
+            currentDB += RECOVERY_OFFSET;
+            if (currentDB > REF_DB) currentDB = REF_DB; // 60dB上限
+
+            updateStats();
+            
+            // フィードバック表示後に次を予約
+            setTimeout(() => {
+                fb.classList.remove("feedback-visible", "fb-miss");
+                scheduleNextSound();
+            }, 2000);
+
+        } else {
+            // 2回目の失敗：ゲームオーバー
+            fb.textContent = "GAME OVER (2 Misses)";
+            fb.classList.add("fb-miss");
+            setTimeout(() => finishGame(true), 1500);
+        }
     }
 }
 
