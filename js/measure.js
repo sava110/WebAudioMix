@@ -18,9 +18,8 @@ const REF_DB = 60;
 const TONE_DURATION = 0.5;
 const PAUSE_DURATION = 1.0;
 
-// ★履歴管理用の変数
-let measurementHistory = []; 
-let trialCount = 1;
+// ★ベケシー法用の変数
+let lastKeyPressedDB = null;
 
 const els = {
     loadingPanel: document.getElementById('loadingPanel'),
@@ -65,7 +64,8 @@ async function startMeasurement() {
     if (audioCtx.state === 'suspended') audioCtx.resume();
 
     isMeasuring = true;
-    currentDB = 0; 
+    currentDB = 0;
+    lastKeyPressedDB = null;
     els.btnStartMeasure.disabled = true;
 
     // 画面表示の更新
@@ -73,10 +73,6 @@ async function startMeasurement() {
         els.stepCounter.style.display = "block";
         els.stepCounter.textContent = "1";
     }
-    
-    // 何回目の試行かを表示
-    els.statusBox.textContent = `【第 ${trialCount} 回目】まもなく開始します...`;
-    if(els.trialInfo) els.trialInfo.textContent = `試行回数: ${trialCount}`;
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -84,7 +80,7 @@ async function startMeasurement() {
         const stepNumber = (currentDB / DB_STEP) + 1;
         if (els.stepCounter) els.stepCounter.textContent = stepNumber;
 
-        els.statusBox.textContent = `第 ${trialCount} 回：再生中...`;
+        els.statusBox.textContent = "再生中...";
         els.statusBox.style.background = "#fff3cd";
         els.statusBox.style.color = "#856404";
 
@@ -125,47 +121,12 @@ function playTone(volume, duration) {
 // ==========================================
 function finishMeasurement() {
     isMeasuring = false;
-    
-    // 今回のdBを履歴に追加
-    measurementHistory.push(currentDB);
-    
-    // 同じ値が2回出ているかチェック
-    const confirmedDB = checkConsistency(measurementHistory);
-
-    if (confirmedDB !== null) {
-        // --- 確定：結果表示へ ---
-        saveAndShowResult(confirmedDB);
-    } else {
-        // --- 未確定：もう一度測定 ---
-        trialCount++;
-        prepareNextTrial();
-    }
-}
-
-// 履歴の中に2回以上出現する値があるか確認する関数
-function checkConsistency(history) {
-    const counts = {};
-    for (const db of history) {
-        counts[db] = (counts[db] || 0) + 1;
-        if (counts[db] >= 2) return db;
-    }
-    return null;
-}
-
-function prepareNextTrial() {
-    els.statusBox.textContent = `${currentDB}dB で反応がありました。確認のためもう一度測定します。`;
-    els.statusBox.style.background = "#d1ecf1";
-    els.statusBox.style.color = "#0c5460";
-    
-    // ボタンを再度有効にして、ユーザーのタイミングで次へ進めるようにする
-    els.btnStartMeasure.disabled = false;
-    els.btnStartMeasure.textContent = `第 ${trialCount} 回目を開始`;
+    saveAndShowResult(currentDB);
 }
 
 function saveAndShowResult(db) {
-    // 確定したGain値も再計算
     const finalGain = Math.pow(10, (db - REF_DB) / 20);
-    
+
     localStorage.setItem('userBaseThresholdDB', db);
     localStorage.setItem('userBaseThresholdGain', finalGain);
 
@@ -173,8 +134,8 @@ function saveAndShowResult(db) {
     if (els.stepCounter) els.stepCounter.style.display = "none";
 
     const finalStep = (db / DB_STEP) + 1;
-    els.resultValue.innerHTML = `確定値: ${db} dB (Step: ${finalStep})<br><small>全試行履歴: ${measurementHistory.join(', ')}</small>`;
-    
+    els.resultValue.innerHTML = `確定値: ${db} dB (Step: ${finalStep})`;
+
     els.measurePanel.classList.add('hidden');
     els.resultPanel.classList.remove('hidden');
 }
@@ -182,6 +143,11 @@ function saveAndShowResult(db) {
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && isMeasuring && els.btnStartMeasure.disabled) {
         e.preventDefault();
-        finishMeasurement();
+        if (lastKeyPressedDB === currentDB) {
+            finishMeasurement();
+        } else {
+            lastKeyPressedDB = currentDB;
+            currentDB -= 20;
+        }
     }
 });
