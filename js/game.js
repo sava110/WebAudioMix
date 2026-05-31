@@ -17,7 +17,11 @@ let latestReactionTime = 0;  // 直近の反応時間（ms）
 let reactionTimes = [];      // 全正解試行の反応時間リスト
 
 // 単語リスト
+// ==========================================
+// 単語リスト（全60単語）
+// ==========================================
 const WORD_LIST = [
+    // --- 既存の10単語 ---
     { romaji: 'atatakaiharunohi', jp: 'あたたかい春の日' },
     { romaji: 'kireinaumiwomiru', jp: 'きれいな海を見る' },
     { romaji: 'midorinokiwoueru', jp: '緑の木を植える' },
@@ -27,7 +31,65 @@ const WORD_LIST = [
     { romaji: 'kodomogawarau', jp: '子供が笑う' },
     { romaji: 'akaruiasagakuru', jp: '明るい朝が来る' },
     { romaji: 'yumenonakadeasobu', jp: '夢の中で遊ぶ' },
-    { romaji: 'tokeiwomiru', jp: '時計を見る' }
+    { romaji: 'tokeiwomiru', jp: '時計を見る' },
+
+    // --- 追加の短い単語（初動やリハビリの基礎用） ---
+    { romaji: 'madowoakeru', jp: '窓を開ける' },
+    { romaji: 'honworemu', jp: '本を読む' },
+    { romaji: 'pashiwouta', jp: '歌をうたう' },
+    { romaji: 'teaworau', jp: '手を洗う' },
+    { romaji: 'kutsuwohaku', jp: '靴を履く' },
+    { romaji: 'kaimononiiku', jp: '買い物に行く' },
+    { romaji: 'hasshiruaruku', jp: '走って歩く' },
+    { romaji: 'shinbwnwomu', jp: '新聞を読む' },
+    { romaji: 'tegamiwokaku', jp: '手紙を書く' },
+    { romaji: 'gohanwotaberu', jp: 'ご飯を食べる' },
+    { romaji: 'mizuwonomu', jp: '水を飲む' },
+    { romaji: 'ofuroniaru', jp: 'お風呂に入る' },
+    { romaji: 'heyawoasoji', jp: '部屋を掃除する' },
+    { romaji: 'denkiwokesu', jp: '電気を消す' },
+    { romaji: 'kagiwosimeru', jp: '鍵を閉める' },
+
+    // --- 追加の中くらいの単語（日常生活の連想） ---
+    { romaji: 'oishiiasagohan', jp: '美味しい朝ごはん' },
+    { romaji: 'terebiwomiru', jp: 'テレビを見る' },
+    { romaji: 'ongakuwokiku', jp: '音楽を聴く' },
+    { romaji: 'inunosanpowosur', jp: '犬の散歩をする' },
+    { romaji: 'tomodachitohanasu', jp: '友達と話す' },
+    { romaji: 'denshaniandoru', jp: '電車に乗る' },
+    { romaji: 'jitenshaniandoru', jp: '自転車に乗る' },
+    { romaji: 'pasokonwotsukau', jp: 'パソコンを使う' },
+    { romaji: 'shukudaigaowaru', jp: '宿題が終わる' },
+    { romaji: 'shashinwotoru', jp: '写真を撮る' },
+    { romaji: 'yasaiwokaumise', jp: '野菜を買う店' },
+    { romaji: 'koutsuushigou', jp: '交通信号' },
+    { romaji: 'koenndeasobu', jp: '公園で遊ぶ' },
+    { romaji: 'fukuwokiandora', jp: '服を着替える' },
+    { romaji: 'sumahowomiruhito', jp: 'スマホを見る人' },
+
+    // --- 追加の長い単語（高い視覚負荷をかける用） ---
+    { romaji: 'renjidegohanwoatatameru', jp: 'レンジでご飯を温める' },
+    { romaji: 'intahiandogarantadonaru', jp: 'インターホンが何度も鳴る' },
+    { romaji: 'kankisangamaasuteiruheya', jp: '換気扇が回っている部屋' },
+    { romaji: 'sentakukigaugoitedasuru', jp: '洗濯機が動いて音がする' },
+    { romaji: 'nichiyoubiandonoasanebou', jp: '日曜日のお寝坊' },
+    { romaji: 'coffeeandowoirenagarahoreru', jp: 'コーヒーを淹れながら待つ' },
+    { romaji: 'soujikiandodeheyaandowohaku', jp: '掃除機で部屋をきれいにする' },
+    { romaji: 'omoshiriandogadongawomiru', jp: '面白い動画を見る' },
+    { romaji: 'shizukaniandootowokiku', jp: '静かに音を聴く' },
+    { romaji: 'asanoisogiandodeisogu', jp: '朝の準備で急ぐ' },
+
+    // --- さらに追加（バリエーション拡充） ---
+    { romaji: 'amegofuriandodasu', jp: '雨が降り出す' },
+    { romaji: 'kazegafwiandoteiru', jp: '風が吹いている' },
+    { romaji: 'reizoukonoandooto', jp: '冷蔵庫の音' },
+    { romaji: 'ginkouandoniiku', jp: '銀行に行く' },
+    { romaji: 'hasshirumichiwosagasu', jp: '走る道を探す' },
+    { romaji: 'soraandowomiandogemiru', jp: '空を見上げる' },
+    { romaji: 'kireinaandohanagasaku', jp: 'きれいな花が咲く' },
+    { romaji: 'niwaniandotorigakuru', jp: '庭に鳥が来る' },
+    { romaji: 'tanoshiiandodokushonoandorikan', jp: '楽しい読書の時間' },
+    { romaji: 'kyouandounotengkiandowasuru', jp: '今日の天気を調べる' }
 ];
 
 // 変数
