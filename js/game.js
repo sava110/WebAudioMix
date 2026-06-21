@@ -130,7 +130,6 @@ const els = {
     btnStart: document.getElementById('btnStart'),
     btnStop: document.getElementById('btnStop'),
     btnDownloadCsv: document.getElementById('btnDownloadCsv'),
-    limitDisplay: document.getElementById('limitDisplay'),
     dispBaseThreshold: document.getElementById('dispBaseThreshold'),
     dispCurrentVol: document.getElementById('dispCurrentVol'),
     dispScore: document.getElementById('dispScore'),
@@ -152,11 +151,10 @@ window.onload = async () => {
     const savedDB = localStorage.getItem('userBaseThresholdDB');
     if (savedDB) {
         baseThresholdDB = parseFloat(savedDB);
-        els.limitDisplay.textContent = `${baseThresholdDB} dB`;
         els.dispBaseThreshold.textContent = `${baseThresholdDB} dB`;
     } else {
-        els.limitDisplay.textContent = "未測定 (初期値: 20dB)";
         baseThresholdDB = 20;
+        els.dispBaseThreshold.textContent = `${baseThresholdDB} dB`;
     }
 
     // 2. 音声ファイルのロード
@@ -203,9 +201,8 @@ function startGame() {
     isGameRunning = true;
     startTime = Date.now();
 
-    // 初期レベル：測定閾値 + 15dB
-    currentDB = baseThresholdDB + START_OFFSET;
-    if (currentDB > REF_DB) currentDB = REF_DB;
+    // 初期レベル：タイピングゲームは 70dB から開始
+    currentDB = 70;
 
     typingScore = 0;
     totalHits = 0;
@@ -372,11 +369,18 @@ function finishGame(isGameOver) {
 // ==========================================
 function setupCsvDownload(finalDB, diff) {
     els.btnDownloadCsv.onclick = () => {
+        // ユーザーにファイル名を入力させる。空白またはキャンセルの場合は日付で保存。
+        const userInput = window.prompt("保存するファイル名を入力してください（空白の場合は日付で保存されます）", "");
+        const now = new Date();
+        const pad = (n) => n.toString().padStart(2, '0');
+        const dateStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+        const filenameBase = (userInput && userInput.trim() !== "") ? userInput.trim() : `training_${dateStr}`;
+
         const timestamp = new Date().toLocaleString();
-        
+
         // CSVヘッダー
         let csvContent = "data:text/csv;charset=utf-8,";
-        
+
         // 1. サマリー情報のセクション
         csvContent += "--- Summary ---\n";
         csvContent += "Date,Base_dB,Final_Training_dB,Diff_dB,Total_Hits,Final_Typing_Score\n";
@@ -385,7 +389,7 @@ function setupCsvDownload(finalDB, diff) {
         // 2. 試行ごとの詳細データセクション
         csvContent += "--- Trial Details ---\n";
         csvContent += "Trial_Number,Target_Volume(dB),Result,Reaction_Time(ms),Elapsed_Time(ms),Typing_Score\n";
-        
+
         trialHistory.forEach(t => {
             csvContent += `${t.trialNumber},${t.targetDB},${t.success ? "Success" : "Miss"},${t.reactionTime},${t.timestamp},${t.typingScoreAtTime}\n`;
         });
@@ -393,9 +397,10 @@ function setupCsvDownload(finalDB, diff) {
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `training_detail_${finalDB}dB.csv`);
+        link.setAttribute("download", `${filenameBase}.csv`);
         document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
     };
 }
 
