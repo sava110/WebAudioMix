@@ -20,7 +20,7 @@ function startRefTone(targetDB) {
     osc = audioCtx.createOscillator();
     gainNode = audioCtx.createGain();
 
-    osc.type = 'sawtooth';
+    osc.type = 'sine';
     osc.frequency.value = 1000;
 
     // dBからGainへの計算

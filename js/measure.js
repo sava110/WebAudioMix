@@ -6,7 +6,7 @@ const AUDIO_PATHS = {
 };
 
 const TARGET_FREQ = 1000;
-const TARGET_TYPE = 'sawtooth';
+const TARGET_TYPE = 'sine';
 
 let audioCtx;
 let currentVol = 0;

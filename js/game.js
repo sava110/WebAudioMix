@@ -3,7 +3,7 @@
 // ==========================================
 const NOISE_FILE_PATH = 'assets/noise/fan.mp3';
 const TARGET_FREQ = 2000;
-const TARGET_TYPE = 'sawtooth';
+const TARGET_TYPE = 'sine';
 const SOUND_DURATION = 0.5;
 const RESPONSE_WINDOW = 2000;
 
