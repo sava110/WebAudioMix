@@ -1,7 +1,7 @@
 // ==========================================
 // 設定：内部ファイルパス・定数
 // ==========================================
-const NOISE_FILE_PATH = 'assets/noise/fan.mp3';
+const NOISE_FILE_PATH = 'assets/noise/kankisen.mp3';
 const TARGET_FREQ = 2000;
 const TARGET_TYPE = 'sine';
 const SOUND_DURATION = 0.5;
