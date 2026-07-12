@@ -220,7 +220,7 @@ function playNoiseLoop() {
     noiseSource.buffer = noiseBuffer;
     noiseSource.loop = true;
     noiseGain = audioCtx.createGain();
-    noiseGain.gain.value = 3.0; // 固定ノイズレベル
+    noiseGain.gain.value = 0.3; // 固定ノイズレベルを3.0から0.3に変更
     noiseSource.connect(noiseGain).connect(audioCtx.destination);
     noiseSource.start();
 }
@@ -254,7 +254,12 @@ function playSoundEffect() {
     currentLevelVol = dbToGain(currentDB);
     gain.gain.value = currentLevelVol;
 
-    osc.connect(gain).connect(audioCtx.destination);
+    // osc.connect(gain).connect(audioCtx.destination);
+
+    // 変更後（全体の出力を 0.1倍 に絞って限界突破を防ぐクッションを入れる）
+    const atten = audioCtx.createGain();
+    atten.gain.value = 0.1; // 10分の1に減衰させる
+    osc.connect(gain).connect(atten).connect(audioCtx.destination);
     
     // ★ 音が鳴る直前に高精度タイムスタンプを記録
     soundStartTime = performance.now(); 
