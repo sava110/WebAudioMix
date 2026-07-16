@@ -21,76 +21,6 @@ let reactionTimes = [];      // 全正解試行の反応時間リスト
 // 単語リスト（全60単語）
 // ==========================================
 const WORD_LIST = [
-    // --- 既存の10単語 ---
-    { romaji: 'atatakaiharunohi', jp: 'あたたかい春の日' },
-    { romaji: 'kireinaumiwomiru', jp: 'きれいな海を見る' },
-    { romaji: 'midorinokiwoueru', jp: '緑の木を植える' },
-    { romaji: 'takaiyamaninoboru', jp: '高い山に登る' },
-    { romaji: 'hiroisorawotobu', jp: '広い空を飛ぶ' },
-    { romaji: 'amaikudamonowokau', jp: '甘い果物を買う' },
-    { romaji: 'kodomogawarau', jp: '子供が笑う' },
-    { romaji: 'akaruiasagakuru', jp: '明るい朝が来る' },
-    { romaji: 'yumenonakadeasobu', jp: '夢の中で遊ぶ' },
-    { romaji: 'tokeiwomiru', jp: '時計を見る' },
-
-    // --- 追加の短い単語（初動やリハビリの基礎用） ---
-    { romaji: 'madowoakeru', jp: '窓を開ける' },
-    { romaji: 'honwoyomu', jp: '本を読む' },
-    { romaji: 'utawoutau', jp: '歌をうたう' },
-    { romaji: 'tewoarau', jp: '手を洗う' },
-    { romaji: 'kutsuwohaku', jp: '靴を履く' },
-    { romaji: 'kaimononiiku', jp: '買い物に行く' },
-    { romaji: 'shinbunwoyomu', jp: '新聞を読む' },
-    { romaji: 'tegamiwokaku', jp: '手紙を書く' },
-    { romaji: 'gohanwotaberu', jp: 'ご飯を食べる' },
-    { romaji: 'mizuwonomu', jp: '水を飲む' },
-    { romaji: 'ofuroniaru', jp: 'お風呂に入る' },
-    { romaji: 'heyawoasoji', jp: '部屋を掃除する' },
-    { romaji: 'denkiwokesu', jp: '電気を消す' },
-    { romaji: 'kagiwosimeru', jp: '鍵を閉める' },
-
-    // --- 追加の中くらいの単語（日常生活の連想） ---
-    { romaji: 'oishiiasagohan', jp: '美味しい朝ごはん' },
-    { romaji: 'terebiwomiru', jp: 'テレビを見る' },
-    { romaji: 'ongakuwokiku', jp: '音楽を聴く' },
-    { romaji: 'inunosanpowosur', jp: '犬の散歩をする' },
-    { romaji: 'tomodachitohanasu', jp: '友達と話す' },
-    { romaji: 'denshaninoru', jp: '電車に乗る' },
-    { romaji: 'jitenshaninoru', jp: '自転車に乗る' },
-    { romaji: 'pasokonwotsukau', jp: 'パソコンを使う' },
-    { romaji: 'shukudaigaowaru', jp: '宿題が終わる' },
-    { romaji: 'shashinwotoru', jp: '写真を撮る' },
-    { romaji: 'yasaiwokaumise', jp: '野菜を買う店' },
-    { romaji: 'koutsuushigou', jp: '交通信号' },
-    { romaji: 'koenndeasobu', jp: '公園で遊ぶ' },
-    { romaji: 'fukuwokigaeru', jp: '服を着替える' },
-    { romaji: 'sumahowomiruhito', jp: 'スマホを見る人' },
-
-    // --- 追加の長い単語（高い視覚負荷をかける用） ---
-    { romaji: 'renjidegohanwoatatameru', jp: 'レンジでご飯を温める' },
-    { romaji: 'innta-honnganandomonaru', jp: 'インターホンが何度も鳴る' },
-    { romaji: 'kankisengamawatteiruheya', jp: '換気扇が回っている部屋' },
-    { romaji: 'sentakukigaugoiteotogasuru', jp: '洗濯機が動いて音がする' },
-    { romaji: 'nichiyoubinoonebou', jp: '日曜日のお寝坊' },
-    { romaji: 'ko-hi-woirenagaramatu', jp: 'コーヒーを淹れながら待つ' },
-    { romaji: 'souzikideheyawokireinisuru', jp: '掃除機で部屋をきれいにする' },
-    { romaji: 'omosiroidougawomiru', jp: '面白い動画を見る' },
-    { romaji: 'shizukaniotowokiku', jp: '静かに音を聴く' },
-    { romaji: 'asanozyunnbideisogu', jp: '朝の準備で急ぐ' },
-
-    // --- さらに追加（バリエーション拡充） ---
-    { romaji: 'amegofuridasu', jp: '雨が降り出す' },
-    { romaji: 'kazegafwiteiru', jp: '風が吹いている' },
-    { romaji: 'reizoukonooto', jp: '冷蔵庫の音' },
-    { romaji: 'ginkouoniiku', jp: '銀行に行く' },
-    { romaji: 'hasshirumichiwosagasu', jp: '走る道を探す' },
-    { romaji: 'sorawomigemiru', jp: '空を見上げる' },
-    { romaji: 'kireinahanagasaku', jp: 'きれいな花が咲く' },
-    { romaji: 'niwanitorigakuru', jp: '庭に鳥が来る' },
-    { romaji: 'tanoshiidokushonorikan', jp: '楽しい読書の時間' },
-    { romaji: 'kyouunotengkiwasuru', jp: '今日の天気を調べる' },
-
-    // オリジナル
     { romaji: 'ginkoudeteikiyokinwosuru', jp: '銀行で定期預金をする' },
     { romaji: 'purintakarainsatusuru', jp: 'プリンタから印刷する' },
     { romaji: 'who-kinguwohazimemasita', jp: 'ウォーキングを始めました' },
@@ -131,33 +61,14 @@ const WORD_LIST = [
     { romaji: 'ongakukanshougasukidesu', jp: '音楽鑑賞が好きです' },
     { romaji: 'keikenwotumukotomodaizidesu', jp: '経験を積む事も大事です' },
     { romaji: 'inhuruenzaninarimasita', jp: 'インフルエンザになりました' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    { romaji: '', jp: '' },
-    
-
+    { romaji: 'nihonnnosikiwotanosimu', jp: '日本の式を楽しむ' },
+    { romaji: 'nihonhagiinnnaikakuseida', jp: '日本は議員内閣制だ' },
+    { romaji: 'enkanatoriumutoiubussitu', jp: '塩化ナトリウムという物質' },
+    { romaji: 'kissatendematiawasewosita', jp: '喫茶店で待ち合わせをした' },
+    { romaji: 'itigoitiewotaisetunisuru', jp: '一期一会を大切にする' },
+    { romaji: 'pariniryourishugyouniiku', jp: 'パリに料理修行に行く' },
+    { romaji: 'okurerutokihadenwawokudasai', jp: '遅れるときは電話をください' },
+    { romaji: 'doubutuennnikazokudeiku', jp: '動物園に家族で行く' }
 ];
 
 // 変数
@@ -282,13 +193,19 @@ function startGame() {
     scheduleNextSound();
 }
 
+
 function playNoiseLoop() {
     if (noiseSource) try { noiseSource.stop(); } catch (e) { }
     noiseSource = audioCtx.createBufferSource();
     noiseSource.buffer = noiseBuffer;
     noiseSource.loop = true;
     noiseGain = audioCtx.createGain();
-    noiseGain.gain.value = 0.3; // 固定ノイズレベルを3.0から0.3に変更
+    
+    // ★ mp3自体の最大振幅を考慮し、デジタル出力を0.1〜0.2程度に一律で下げる
+    // これにより、背景ノイズ単体でのクリッピングを完全に防ぐ
+    noiseGain.gain.value = 0.15; 
+
+    // 直接 destination に繋ぐ（コンプレッサーは通さない）
     noiseSource.connect(noiseGain).connect(audioCtx.destination);
     noiseSource.start();
 }
@@ -319,19 +236,18 @@ function playSoundEffect() {
     osc.type = TARGET_TYPE;
     osc.frequency.value = TARGET_FREQ;
     
-    currentLevelVol = dbToGain(currentDB);
-    gain.gain.value = currentLevelVol;
-
-    // osc.connect(gain).connect(audioCtx.destination);
-
-    // 変更後（全体の出力を 0.1倍 に絞って限界突破を防ぐクッションを入れる）
-    const atten = audioCtx.createGain();
-    atten.gain.value = 0.1; // 10分の1に減衰させる
-    osc.connect(gain).connect(atten).connect(audioCtx.destination);
+    // 基準となるGainの変換
+    currentLevelVol = dbToGain(currentDB); 
     
-    // ★ 音が鳴る直前に高精度タイムスタンプを記録
+    // ★ 電子音側にも一律でアッテネーション（減衰：例として0.1倍）をかける
+    // これにより、合算値が1.0を超えるのを未然に防ぎ、5dB刻みの「相対関係」は100%維持する
+    const attenVal = 0.1; 
+    gain.gain.value = currentLevelVol * attenVal;
+
+    // 直接 destination に繋ぐ
+    osc.connect(gain).connect(audioCtx.destination);
+    
     soundStartTime = performance.now(); 
-    
     osc.start();
     osc.stop(audioCtx.currentTime + SOUND_DURATION);
 
