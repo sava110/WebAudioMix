@@ -5,8 +5,8 @@ const AUDIO_PATHS = {
     noise: 'assets/noise/kankisen.mp3'
 };
 
-const TARGET_FREQ = 1000;
-const TARGET_TYPE = 'sine';
+const TARGET_FREQ = TONE.FREQ;
+const TARGET_TYPE = TONE.TYPE;
 
 let audioCtx;
 let currentVol = 0;
@@ -67,6 +67,7 @@ async function startMeasurement() {
     currentDB = 0;
     lastKeyPressedDB = null;
     els.btnStartMeasure.disabled = true;
+    if (document.activeElement) document.activeElement.blur();
 
     // 画面表示の更新
     if (els.stepCounter) {
@@ -84,7 +85,7 @@ async function startMeasurement() {
         els.statusBox.style.background = "#fff3cd";
         els.statusBox.style.color = "#856404";
 
-        currentVol = Math.pow(10, (currentDB - REF_DB) / 20);
+        currentVol = TONE.dbToGain(currentDB);
 
         if (!isMeasuring) break;
         await playTone(currentVol, TONE_DURATION);
@@ -125,7 +126,7 @@ function finishMeasurement() {
 }
 
 function saveAndShowResult(db) {
-    const finalGain = Math.pow(10, (db - REF_DB) / 20);
+    const finalGain = TONE.dbToGain(db);
 
     localStorage.setItem('userBaseThresholdDB', db);
     localStorage.setItem('userBaseThresholdGain', finalGain);
@@ -139,6 +140,10 @@ function saveAndShowResult(db) {
     els.measurePanel.classList.add('hidden');
     els.resultPanel.classList.remove('hidden');
 }
+
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && isMeasuring) e.preventDefault();
+}, true);
 
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' && isMeasuring && els.btnStartMeasure.disabled) {

@@ -2,82 +2,96 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Dual Task Training (Sudden Death)</title>
+    <title>Dual Task Training</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h2>Step 2: Dual Task Training</h2>
+            <h2>Step 2: 本番セッション</h2>
         </header>
 
         <div id="setupPanel" class="panel">
-            <h3>トレーニング準備</h3>
-            
+            <h3>セッションの流れ</h3>
             <div id="loadStatus" style="margin: 20px 0; padding: 10px; background: #22303f; border-radius: 5px;">
                 環境音を読み込んでいます...
             </div>
-
-            <p class="instruction">
-                <strong>【ルール】</strong><br>
-                これから換気扇の音（環境音）が流れる中で、タイピングゲームを行います。<br>
-                タイピング中に音が鳴ったら、できるだけ早くスペースキーを押してください。<br>
-                音が鳴ったのに気づかずスルーしてしまうとミスになります。<br>
-                音が鳴っていないのに間違えてスペースキーを押しても「お手つき」でミスになります。<br>
-                1回ミスをすると、次の音は少し大きくなって優しくなります。<br>
-                合計2回ミスをすると、その時点でゲームオーバーになり、結果画面に進みます。
-
+            <p class="instruction" style="text-align:left;">
+                1. 本番前：文字だけ 2分（音は鳴らない）<br>
+                2. 本番前：音だけ 2分（文字は打たない）<br>
+                3. 本番を 3回。各回は音が 20回鳴ったら終わる。あいだに休憩とアンケート<br>
+                4. 本番後：文字だけ 2分、音だけ 2分
             </p>
-            <button id="btnStart" class="btn-primary" disabled>ゲームスタート</button>
+            <p class="instruction">
+                音が鳴ったらスペースキー。ミスすると次の音は 10 dB 大きくなります。2回ミスでは終わりません。
+            </p>
+            <button id="btnStart" class="btn-primary" disabled>セッション開始</button>
+        </div>
+
+        <div id="introPanel" class="panel hidden">
+            <p id="introStep" class="step-label"></p>
+            <h3 id="introTitle">準備</h3>
+            <p id="introText" class="instruction"></p>
+            <button id="btnPhaseStart" class="btn-primary">開始</button>
         </div>
 
         <div id="gamePanel" class="panel hidden">
+            <p id="phaseStep" class="step-label"></p>
+            <h3 id="phaseTitle">測定中</h3>
             <div class="game-header">
                 <div class="stat-box">
-                    <span class="label">Quiet Limit</span>
-                    <span class="value" id="dispBaseThreshold">---</span>
+                    <span class="label" id="progressLabel">進捗</span>
+                    <span class="value" id="dispProgress">---</span>
                 </div>
                 <div class="stat-box">
-                    <span class="label">Current Level</span>
+                    <span class="label">今の音量</span>
                     <span class="value" id="dispCurrentVol">---</span>
                 </div>
                 <div class="stat-box">
-                    <span class="label">Score</span>
-                    <span class="value" id="dispScore">0</span>
+                    <span class="label">打鍵速度 (KPM)</span>
+                    <span class="value" id="dispKpm">0</span>
                 </div>
             </div>
 
-            <div class="typing-area">
+            <div class="typing-area" id="typingArea">
                 <div class="romaji-display" id="romajiDisplay"></div>
                 <div class="japanese-display" id="japaneseDisplay"></div>
             </div>
+            <p id="listenMessage" class="instruction hidden">雑音の中で音が鳴ったら、スペースキーを押してください。</p>
 
             <div id="hearingFeedback" class="feedback-hidden">Good!</div>
+            <button id="btnStop" class="btn-danger">このブロックを中断</button>
+        </div>
 
-            <button id="btnStop" class="btn-secondary">中断する</button>
+        <div id="breakPanel" class="panel hidden">
+            <p id="breakStep" class="step-label"></p>
+            <h3>休憩</h3>
+            <p id="breakNext" class="instruction"></p>
+            <p class="instruction">3分休んで、アンケートに答えてください。</p>
+            <p id="breakClock" class="break-clock">3:00</p>
+            <button id="btnBreakDone" class="btn-primary">次の回へ</button>
         </div>
 
         <div id="resultPanel" class="panel hidden">
-            <h3>トレーニング結果</h3>
-
+            <h3 id="resultTitle">ブロック結果</h3>
             <div style="text-align: left; background: #22303f; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <p>静寂時の聞こえ (Base): <strong id="resBase" style="color:#f1c40f">---</strong></p>
-                <p>今回の限界 (Training): <strong id="resTrain" style="color:#f1c40f">---</strong></p>
-                <hr style="border-color: #555;">
-                <p><strong>差分 (Masking Amount): <span id="resDiff" style="color:#e74c3c; font-size:1.4em;">---</span></strong></p>
-                <p style="font-size: 0.9em; color: #bdc3c7;">※ この数値が大きいほど、ノイズと作業の影響を受けています。</p>
+                <p>打鍵速度 (KPM): <strong id="resKpm">---</strong></p>
+                <p>音への正解: <strong id="resHits">---</strong></p>
+                <p>平均の反応時間: <strong id="resRt">---</strong></p>
+                <p style="font-size: 0.9em; color: #bdc3c7;">最後に正解した音量（参考。配分の指標には使いません）: <span id="resLastDb">---</span></p>
             </div>
-
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <div>タイピングスコア: <span id="resScore">0</span></div>
-                <div>正解回数: <span id="resHits">0</span>回</div>
-            </div>
-
-            <button id="btnDownloadCsv" class="btn-primary">CSV保存</button>
-            <button onclick="location.reload()" class="btn-secondary">最初に戻る</button>
+            <button id="btnNext" class="btn-primary">次へ</button>
+            <button id="btnDownloadCsv" class="btn-secondary">ここまでのCSV</button>
         </div>
 
+        <div id="donePanel" class="panel hidden">
+            <h3>セッション完了</h3>
+            <div id="doneSummary" style="text-align:left;"></div>
+            <button id="btnDownloadFinal" class="btn-primary">セッションCSV</button>
+            <button onclick="location.reload()" class="btn-secondary">最初に戻る</button>
+        </div>
     </div>
+    <script src="js/audio.js"></script>
     <script src="js/game.js"></script>
 </body>
 </html>

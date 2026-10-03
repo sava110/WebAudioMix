@@ -2,8 +2,6 @@ let audioCtx;
 let osc = null;
 let gainNode = null;
 
-const REF_DB = 60; // 基準となるdB (Gain 1.0)
-
 const status = document.getElementById('statusBox');
 
 // イベントリスナーの設定
@@ -20,13 +18,11 @@ function startRefTone(targetDB) {
     osc = audioCtx.createOscillator();
     gainNode = audioCtx.createGain();
 
-    osc.type = 'sine';
-    osc.frequency.value = 1000;
+    osc.type = TONE.TYPE;
+    osc.frequency.value = TONE.FREQ;
 
-    // dBからGainへの計算
-    // 60dB = 1.0
-    // 50dB = 10^((50-60)/20) ≒ 0.3162
-    const targetGain = Math.pow(10, (targetDB - REF_DB) / 20);
+    // 本番・測定と同じ式（60dB のデジタルゲインは 0.1）
+    const targetGain = TONE.dbToGain(targetDB);
     gainNode.gain.value = targetGain;
 
     osc.connect(gainNode).connect(audioCtx.destination);
