@@ -34,48 +34,48 @@ const INTRO = {
     dual: '換気扇の音の中で文字を打ちながら、鳴った音にスペースキーで答えてください。音は20回鳴ったら終わります。2回ミスでは終わりません。ミスすると次の音は10 dB大きくなります。'
 };
 
-// ハイフン入りの語は打てないので除く（40語）
+// ハイフン入りの語は打てないので除く（40語）。html は漢字の上の振り仮名。
 const WORD_LIST = [
-    { romaji: 'ginkoudeteikiyokinwosuru', jp: '銀行で定期預金をする' },
-    { romaji: 'purintakarainsatusuru', jp: 'プリンタから印刷する' },
-    { romaji: 'hatumeikahaidaideatta', jp: '発明家は偉大であった' },
-    { romaji: 'asukarasingakkidesu', jp: '明日から新学期です' },
-    { romaji: 'rekisinobenkyouwosuru', jp: '歴史の勉強をする' },
-    { romaji: 'yakeinokireinaoka', jp: '夜景のきれいな丘' },
-    { romaji: 'taikendanwoosietekudasai', jp: '体験談を教えてください' },
-    { romaji: 'tameninaruhanasiwokiku', jp: 'ためになる話を聞く' },
-    { romaji: 'kyuusyuunihtabinidemasu', jp: '九州に旅に出ます' },
-    { romaji: 'kyouhahisasiburinoyasumidesu', jp: '今日は久しぶりの休みです' },
-    { romaji: 'sodaigominohiwokakuninsuru', jp: '粗大ごみの日を確認する' },
-    { romaji: 'kendouwonaratteimasita', jp: '剣道を習っていました' },
-    { romaji: 'anihayuumeidaigakuniitta', jp: '兄は有名大学に行った' },
-    { romaji: 'keikangausinawaretutuaru', jp: '景観が失われつつある' },
-    { romaji: 'isshuukanhananokakandesu', jp: '一週間は七日間です' },
-    { romaji: 'sanheihounoteiri', jp: '三平方の定理' },
-    { romaji: 'sinrinnnohogokatudouwosuru', jp: '森林の保護活動をする' },
-    { romaji: 'haruyasumihaokinawaheikou', jp: '春休みは沖縄へ行こう' },
-    { romaji: 'koshouwotottekudasai', jp: 'コショウを取ってください' },
-    { romaji: 'harugamatidoosii', jp: '春が待ち遠しい' },
-    { romaji: 'bunkasainidekakemasu', jp: '文化祭に出かけます' },
-    { romaji: 'natuhauminidekaketai', jp: '夏は海に出かけたい' },
-    { romaji: 'taikendanwohirousita', jp: '体験談を披露した' },
-    { romaji: 'asitahaasitanokazegahuku', jp: '明日は明日の風が吹く' },
-    { romaji: 'sizimihakanzouniyoitoiu', jp: 'シジミは肝臓の良いと言う' },
-    { romaji: 'mirainotameniimadekirukoto', jp: '未来のために今できる事' },
-    { romaji: 'kitainikotaeru', jp: '期待に応える' },
-    { romaji: 'sennnyuukanwoataeru', jp: '先入観をあたえる' },
-    { romaji: 'kyabetunosyuukakuzikida', jp: 'キャベツの収穫時期だ' },
-    { romaji: 'ongakukanshougasukidesu', jp: '音楽鑑賞が好きです' },
-    { romaji: 'keikenwotumukotomodaizidesu', jp: '経験を積む事も大事です' },
-    { romaji: 'inhuruenzaninarimasita', jp: 'インフルエンザになりました' },
-    { romaji: 'nihonnnosikiwotanosimu', jp: '日本の式を楽しむ' },
-    { romaji: 'nihonhagiinnnaikakuseida', jp: '日本は議員内閣制だ' },
-    { romaji: 'enkanatoriumutoiubussitu', jp: '塩化ナトリウムという物質' },
-    { romaji: 'kissatendematiawasewosita', jp: '喫茶店で待ち合わせをした' },
-    { romaji: 'itigoitiewotaisetunisuru', jp: '一期一会を大切にする' },
-    { romaji: 'pariniryourishugyouniiku', jp: 'パリに料理修行に行く' },
-    { romaji: 'okurerutokihadenwawokudasai', jp: '遅れるときは電話をください' },
-    { romaji: 'doubutuennnikazokudeiku', jp: '動物園に家族で行く' }
+    { romaji: 'ginkoudeteikiyokinwosuru', jp: '銀行で定期預金をする', html: '<ruby>銀行<rt>ぎんこう</rt></ruby>で<ruby>定期預金<rt>ていきよきん</rt></ruby>をする' },
+    { romaji: 'purintakarainsatusuru', jp: 'プリンタから印刷する', html: 'プリンタから<ruby>印刷<rt>いんさつ</rt></ruby>する' },
+    { romaji: 'hatumeikahaidaideatta', jp: '発明家は偉大であった', html: '<ruby>発明家<rt>はつめいか</rt></ruby>は<ruby>偉大<rt>いだい</rt></ruby>であった' },
+    { romaji: 'asukarasingakkidesu', jp: '明日から新学期です', html: '<ruby>明日<rt>あす</rt></ruby>から<ruby>新学期<rt>しんがっき</rt></ruby>です' },
+    { romaji: 'rekisinobenkyouwosuru', jp: '歴史の勉強をする', html: '<ruby>歴史<rt>れきし</rt></ruby>の<ruby>勉強<rt>べんきょう</rt></ruby>をする' },
+    { romaji: 'yakeinokireinaoka', jp: '夜景のきれいな丘', html: '<ruby>夜景<rt>やけい</rt></ruby>のきれいな<ruby>丘<rt>おか</rt></ruby>' },
+    { romaji: 'taikendanwoosietekudasai', jp: '体験談を教えてください', html: '<ruby>体験談<rt>たいけんだん</rt></ruby>を<ruby>教<rt>おし</rt></ruby>えてください' },
+    { romaji: 'tameninaruhanasiwokiku', jp: 'ためになる話を聞く', html: 'ためになる<ruby>話<rt>はなし</rt></ruby>を<ruby>聞<rt>き</rt></ruby>く' },
+    { romaji: 'kyuusyuunihtabinidemasu', jp: '九州に旅に出ます', html: '<ruby>九州<rt>きゅうしゅう</rt></ruby>に<ruby>旅<rt>たび</rt></ruby>に<ruby>出<rt>で</rt></ruby>ます' },
+    { romaji: 'kyouhahisasiburinoyasumidesu', jp: '今日は久しぶりの休みです', html: '<ruby>今日<rt>きょう</rt></ruby>は<ruby>久<rt>ひさ</rt></ruby>しぶりの<ruby>休<rt>やす</rt></ruby>みです' },
+    { romaji: 'sodaigominohiwokakuninsuru', jp: '粗大ごみの日を確認する', html: '<ruby>粗大<rt>そだい</rt></ruby>ごみの<ruby>日<rt>ひ</rt></ruby>を<ruby>確認<rt>かくにん</rt></ruby>する' },
+    { romaji: 'kendouwonaratteimasita', jp: '剣道を習っていました', html: '<ruby>剣道<rt>けんどう</rt></ruby>を<ruby>習<rt>なら</rt></ruby>っていました' },
+    { romaji: 'anihayuumeidaigakuniitta', jp: '兄は有名大学に行った', html: '<ruby>兄<rt>あに</rt></ruby>は<ruby>有名大学<rt>ゆうめいだいがく</rt></ruby>に<ruby>行<rt>い</rt></ruby>った' },
+    { romaji: 'keikangausinawaretutuaru', jp: '景観が失われつつある', html: '<ruby>景観<rt>けいかん</rt></ruby>が<ruby>失<rt>うしな</rt></ruby>われつつある' },
+    { romaji: 'isshuukanhananokakandesu', jp: '一週間は七日間です', html: '<ruby>一週間<rt>いっしゅうかん</rt></ruby>は<ruby>七日間<rt>なのかかん</rt></ruby>です' },
+    { romaji: 'sanheihounoteiri', jp: '三平方の定理', html: '<ruby>三平方<rt>さんへいほう</rt></ruby>の<ruby>定理<rt>ていり</rt></ruby>' },
+    { romaji: 'sinrinnnohogokatudouwosuru', jp: '森林の保護活動をする', html: '<ruby>森林<rt>しんりん</rt></ruby>の<ruby>保護活動<rt>ほごかつどう</rt></ruby>をする' },
+    { romaji: 'haruyasumihaokinawaheikou', jp: '春休みは沖縄へ行こう', html: '<ruby>春休み<rt>はるやすみ</rt></ruby>は<ruby>沖縄<rt>おきなわ</rt></ruby>へ<ruby>行<rt>い</rt></ruby>こう' },
+    { romaji: 'koshouwotottekudasai', jp: 'コショウを取ってください', html: 'コショウを<ruby>取<rt>と</rt></ruby>ってください' },
+    { romaji: 'harugamatidoosii', jp: '春が待ち遠しい', html: '<ruby>春<rt>はる</rt></ruby>が<ruby>待<rt>ま</rt></ruby>ち<ruby>遠<rt>どお</rt></ruby>しい' },
+    { romaji: 'bunkasainidekakemasu', jp: '文化祭に出かけます', html: '<ruby>文化祭<rt>ぶんかさい</rt></ruby>に<ruby>出<rt>で</rt></ruby>かけます' },
+    { romaji: 'natuhauminidekaketai', jp: '夏は海に出かけたい', html: '<ruby>夏<rt>なつ</rt></ruby>は<ruby>海<rt>うみ</rt></ruby>に<ruby>出<rt>で</rt></ruby>かけたい' },
+    { romaji: 'taikendanwohirousita', jp: '体験談を披露した', html: '<ruby>体験談<rt>たいけんだん</rt></ruby>を<ruby>披露<rt>ひろう</rt></ruby>した' },
+    { romaji: 'asitahaasitanokazegahuku', jp: '明日は明日の風が吹く', html: '<ruby>明日<rt>あした</rt></ruby>は<ruby>明日<rt>あした</rt></ruby>の<ruby>風<rt>かぜ</rt></ruby>が<ruby>吹<rt>ふ</rt></ruby>く' },
+    { romaji: 'sizimihakanzouniyoitoiu', jp: 'シジミは肝臓の良いと言う', html: 'シジミは<ruby>肝臓<rt>かんぞう</rt></ruby>の<ruby>良<rt>よ</rt></ruby>いと<ruby>言<rt>い</rt></ruby>う' },
+    { romaji: 'mirainotameniimadekirukoto', jp: '未来のために今できる事', html: '<ruby>未来<rt>みらい</rt></ruby>のために<ruby>今<rt>いま</rt></ruby>できる<ruby>事<rt>こと</rt></ruby>' },
+    { romaji: 'kitainikotaeru', jp: '期待に応える', html: '<ruby>期待<rt>きたい</rt></ruby>に<ruby>応<rt>こた</rt></ruby>える' },
+    { romaji: 'sennnyuukanwoataeru', jp: '先入観をあたえる', html: '<ruby>先入観<rt>せんにゅうかん</rt></ruby>をあたえる' },
+    { romaji: 'kyabetunosyuukakuzikida', jp: 'キャベツの収穫時期だ', html: 'キャベツの<ruby>収穫時期<rt>しゅうかくじき</rt></ruby>だ' },
+    { romaji: 'ongakukanshougasukidesu', jp: '音楽鑑賞が好きです', html: '<ruby>音楽鑑賞<rt>おんがくかんしょう</rt></ruby>が<ruby>好<rt>す</rt></ruby>きです' },
+    { romaji: 'keikenwotumukotomodaizidesu', jp: '経験を積む事も大事です', html: '<ruby>経験<rt>けいけん</rt></ruby>を<ruby>積<rt>つ</rt></ruby>む<ruby>事<rt>こと</rt></ruby>も<ruby>大事<rt>だいじ</rt></ruby>です' },
+    { romaji: 'inhuruenzaninarimasita', jp: 'インフルエンザになりました', html: 'インフルエンザになりました' },
+    { romaji: 'nihonnnosikiwotanosimu', jp: '日本の式を楽しむ', html: '<ruby>日本<rt>にほん</rt></ruby>の<ruby>式<rt>しき</rt></ruby>を<ruby>楽<rt>たの</rt></ruby>しむ' },
+    { romaji: 'nihonhagiinnnaikakuseida', jp: '日本は議員内閣制だ', html: '<ruby>日本<rt>にほん</rt></ruby>は<ruby>議員内閣制<rt>ぎいんないかくせい</rt></ruby>だ' },
+    { romaji: 'enkanatoriumutoiubussitu', jp: '塩化ナトリウムという物質', html: '<ruby>塩化<rt>えんか</rt></ruby>ナトリウムという<ruby>物質<rt>ぶっしつ</rt></ruby>' },
+    { romaji: 'kissatendematiawasewosita', jp: '喫茶店で待ち合わせをした', html: '<ruby>喫茶店<rt>きっさてん</rt></ruby>で<ruby>待<rt>ま</rt></ruby>ち<ruby>合<rt>あ</rt></ruby>わせをした' },
+    { romaji: 'itigoitiewotaisetunisuru', jp: '一期一会を大切にする', html: '<ruby>一期一会<rt>いちごいちえ</rt></ruby>を<ruby>大切<rt>たいせつ</rt></ruby>にする' },
+    { romaji: 'pariniryourishugyouniiku', jp: 'パリに料理修行に行く', html: 'パリに<ruby>料理修行<rt>りょうりしゅぎょう</rt></ruby>に<ruby>行<rt>い</rt></ruby>く' },
+    { romaji: 'okurerutokihadenwawokudasai', jp: '遅れるときは電話をください', html: '<ruby>遅<rt>おく</rt></ruby>れるときは<ruby>電話<rt>でんわ</rt></ruby>をください' },
+    { romaji: 'doubutuennnikazokudeiku', jp: '動物園に家族で行く', html: '<ruby>動物園<rt>どうぶつえん</rt></ruby>に<ruby>家族<rt>かぞく</rt></ruby>で<ruby>行<rt>い</rt></ruby>く' }
 ];
 
 let audioCtx;
@@ -483,7 +483,7 @@ function renderWord() {
         `<span class="typed-char">${typed}</span>` +
         `<span class="current-char">${current}</span>` +
         `<span class="untyped-char">${rest}</span>`;
-    els.japaneseDisplay.textContent = currentWordObj.jp;
+    els.japaneseDisplay.innerHTML = currentWordObj.html;
 }
 
 function checkTyping(key) {

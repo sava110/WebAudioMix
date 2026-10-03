@@ -99,8 +99,17 @@ button:focus-visible {
 }
 .japanese-display {
     font-size: 24px;
-    color: #95a5a6;
-    margin-top: 10px;
+    color: #d5dde6;
+    margin-top: 14px;
+    line-height: 2.6;
+}
+.japanese-display ruby {
+    ruby-position: over;
+}
+.japanese-display rt {
+    font-size: 0.45em;
+    line-height: 1;
+    color: #f7dc6f;
 }
 .typed-char { color: #7f8c9a; }
 .current-char {
