@@ -14,12 +14,17 @@ let isMeasuring = false;
 
 let currentDB = 0;
 const DB_STEP = 5;
+const MIN_DB = 0;
 const REF_DB = 60;
 const TONE_DURATION = 0.5;
 const PAUSE_DURATION = 1.0;
+const DROP_DB = DB_STEP * 3;
 
-// ★ベケシー法用の変数
+// 同じ音量で2回押されたときだけ確定する
 let lastKeyPressedDB = null;
+let restartFrom = null;
+let acceptingResponse = false;
+let respondedThisTone = false;
 
 const els = {
     loadingPanel: document.getElementById('loadingPanel'),
@@ -64,22 +69,26 @@ async function startMeasurement() {
     if (audioCtx.state === 'suspended') audioCtx.resume();
 
     isMeasuring = true;
-    currentDB = 0;
+    currentDB = MIN_DB;
     lastKeyPressedDB = null;
+    restartFrom = null;
+    acceptingResponse = false;
+    respondedThisTone = false;
     els.btnStartMeasure.disabled = true;
     if (document.activeElement) document.activeElement.blur();
 
-    // 画面表示の更新
     if (els.stepCounter) {
         els.stepCounter.style.display = "block";
         els.stepCounter.textContent = "1";
     }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
+    if (!isMeasuring) return;
 
     while (isMeasuring && currentDB <= REF_DB) {
-        const stepNumber = (currentDB / DB_STEP) + 1;
-        if (els.stepCounter) els.stepCounter.textContent = stepNumber;
+        respondedThisTone = false;
+        acceptingResponse = true;
+        showStep(currentDB);
 
         els.statusBox.textContent = "再生中...";
         els.statusBox.style.background = "#fff3cd";
@@ -96,8 +105,42 @@ async function startMeasurement() {
         els.statusBox.style.color = "#ecf0f1";
 
         await new Promise(resolve => setTimeout(resolve, PAUSE_DURATION * 1000));
-        currentDB += DB_STEP;
+        acceptingResponse = false;
+        if (!isMeasuring) break;
+
+        if (restartFrom !== null) {
+            currentDB = clampDb(restartFrom);
+            restartFrom = null;
+        } else if (currentDB >= REF_DB) {
+            abortAtCeiling();
+            break;
+        } else {
+            currentDB = clampDb(currentDB + DB_STEP);
+        }
     }
+    acceptingResponse = false;
+}
+
+function clampDb(db) {
+    return Math.max(MIN_DB, Math.min(REF_DB, db));
+}
+
+function showStep(db) {
+    if (!els.stepCounter) return;
+    const step = (db / DB_STEP) + 1;
+    els.stepCounter.textContent = String(Math.max(1, step));
+}
+
+function abortAtCeiling() {
+    isMeasuring = false;
+    acceptingResponse = false;
+    restartFrom = null;
+    els.statusBox.textContent = "上限の 60 dB まで大きくしても、スペースキーは押されませんでした。測定を中断しました。はじめからやり直してください。";
+    els.statusBox.style.background = "#f8d7da";
+    els.statusBox.style.color = "#721c24";
+    if (els.stepCounter) els.stepCounter.style.display = "none";
+    els.btnStartMeasure.disabled = false;
+    els.btnStartMeasure.textContent = "もう一度測定する";
 }
 
 function playTone(volume, duration) {
@@ -146,13 +189,13 @@ document.addEventListener('keydown', (e) => {
 }, true);
 
 document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && isMeasuring && els.btnStartMeasure.disabled) {
-        e.preventDefault();
-        if (lastKeyPressedDB === currentDB) {
-            finishMeasurement();
-        } else {
-            lastKeyPressedDB = currentDB;
-            currentDB -= 20;
-        }
+    if (e.code !== 'Space' || !isMeasuring || !acceptingResponse || respondedThisTone) return;
+    e.preventDefault();
+    respondedThisTone = true;
+    if (lastKeyPressedDB === currentDB) {
+        finishMeasurement();
+        return;
     }
+    lastKeyPressedDB = currentDB;
+    restartFrom = Math.max(MIN_DB, currentDB - DROP_DB);
 });
