@@ -1,11 +1,11 @@
 // ==========================================
 // 本番セッション
-// 前：文字2分 → 音2分 → 本番20音×3（あいだに休憩）→ 後：文字2分 → 音2分
+// 前：文字1分 → 音1分 → 本番20音×3（あいだに休憩）→ 後：文字1分 → 音1分
 // ==========================================
 const NOISE_FILE_PATH = 'assets/noise/kankisen.mp3';
 const NOISE_GAIN = 0.15;
 const RESPONSE_WINDOW = 2000;
-const BLOCK_MS = 2 * 60 * 1000;
+const BLOCK_MS = 60 * 1000;
 const DUAL_TRIALS = 20;
 const START_DB = 70;
 const MAX_DB = 80;
@@ -16,25 +16,25 @@ const MIN_DELAY = 3000;
 const MAX_DELAY = 10000;
 
 const PHASES = [
-    { id: 'pre_typing', kind: 'typing', title: '本番前：文字だけ（2分）' },
-    { id: 'pre_sound', kind: 'sound', title: '本番前：音だけ（2分）' },
+    { id: 'pre_typing', kind: 'typing', title: '本番前：文字だけ（1分）' },
+    { id: 'pre_sound', kind: 'sound', title: '本番前：音だけ（1分）' },
     { id: 'dual_1', kind: 'dual', title: '本番 1回目（音20回）' },
     { id: 'break_1', kind: 'break', title: '休憩' },
     { id: 'dual_2', kind: 'dual', title: '本番 2回目（音20回）' },
     { id: 'break_2', kind: 'break', title: '休憩' },
     { id: 'dual_3', kind: 'dual', title: '本番 3回目（音20回）' },
     { id: 'break_3', kind: 'break', title: '休憩' },
-    { id: 'post_typing', kind: 'typing', title: '本番後：文字だけ（2分）' },
-    { id: 'post_sound', kind: 'sound', title: '本番後：音だけ（2分）' }
+    { id: 'post_typing', kind: 'typing', title: '本番後：文字だけ（1分）' },
+    { id: 'post_sound', kind: 'sound', title: '本番後：音だけ（1分）' }
 ];
 
 const INTRO = {
-    typing: '音は鳴りません。画面の文字を、2分間打ってください。速さは1分間の打鍵数（KPM）で記録します。',
-    sound: '文字は打ちません。換気扇の音の中で「ピー」が鳴ったら、スペースキーを押してください。2分で終わります。ミスしても続き、次の音は10 dB大きくなります。',
+    typing: '音は鳴りません。画面の文字を、1分間打ってください。si と shi のように、同じ音なら別の打ち方でも進めます。速さは1分間の打鍵数（KPM）で記録します。',
+    sound: '文字は打ちません。換気扇の音の中で「ピー」が鳴ったら、スペースキーを押してください。1分で終わります。ミスしても続き、次の音は10 dB大きくなります。',
     dual: '換気扇の音の中で文字を打ちながら、鳴った音にスペースキーで答えてください。音は20回鳴ったら終わります。2回ミスでは終わりません。ミスすると次の音は10 dB大きくなります。'
 };
 
-// ハイフン入りの語は打てないので除く（40語）。html は漢字の上の振り仮名。
+// ハイフン入りの語は打てないので除く（80語）。html は漢字の上の振り仮名。
 const WORD_LIST = [
     { romaji: 'ginkoudeteikiyokinwosuru', jp: '銀行で定期預金をする', html: '<ruby>銀行<rt>ぎんこう</rt></ruby>で<ruby>定期預金<rt>ていきよきん</rt></ruby>をする' },
     { romaji: 'purintakarainsatusuru', jp: 'プリンタから印刷する', html: 'プリンタから<ruby>印刷<rt>いんさつ</rt></ruby>する' },
@@ -75,7 +75,47 @@ const WORD_LIST = [
     { romaji: 'itigoitiewotaisetunisuru', jp: '一期一会を大切にする', html: '<ruby>一期一会<rt>いちごいちえ</rt></ruby>を<ruby>大切<rt>たいせつ</rt></ruby>にする' },
     { romaji: 'pariniryourishugyouniiku', jp: 'パリに料理修行に行く', html: 'パリに<ruby>料理修行<rt>りょうりしゅぎょう</rt></ruby>に<ruby>行<rt>い</rt></ruby>く' },
     { romaji: 'okurerutokihadenwawokudasai', jp: '遅れるときは電話をください', html: '<ruby>遅<rt>おく</rt></ruby>れるときは<ruby>電話<rt>でんわ</rt></ruby>をください' },
-    { romaji: 'doubutuennnikazokudeiku', jp: '動物園に家族で行く', html: '<ruby>動物園<rt>どうぶつえん</rt></ruby>に<ruby>家族<rt>かぞく</rt></ruby>で<ruby>行<rt>い</rt></ruby>く' }
+    { romaji: 'doubutuennnikazokudeiku', jp: '動物園に家族で行く', html: '<ruby>動物園<rt>どうぶつえん</rt></ruby>に<ruby>家族<rt>かぞく</rt></ruby>で<ruby>行<rt>い</rt></ruby>く' },
+    { romaji: 'asagohannnimisosiruwonomu', jp: '朝ごはんに味噌汁を飲む', html: '<ruby>朝<rt>あさ</rt></ruby>ごはんに<ruby>味噌汁<rt>みそしる</rt></ruby>を<ruby>飲<rt>の</rt></ruby>む' },
+    { romaji: 'tosyokandehonwokarimasu', jp: '図書館で本を借ります', html: '<ruby>図書館<rt>としょかん</rt></ruby>で<ruby>本<rt>ほん</rt></ruby>を<ruby>借<rt>か</rt></ruby>ります' },
+    { romaji: 'densyagaokuretekomarimasita', jp: '電車が遅れて困りました', html: '<ruby>電車<rt>でんしゃ</rt></ruby>が<ruby>遅<rt>おく</rt></ruby>れて<ruby>困<rt>こま</rt></ruby>りました' },
+    { romaji: 'atarasiikutuwokainiiku', jp: '新しい靴を買いに行く', html: '<ruby>新<rt>あたら</rt></ruby>しい<ruby>靴<rt>くつ</rt></ruby>を<ruby>買<rt>か</rt></ruby>いに<ruby>行<rt>い</rt></ruby>く' },
+    { romaji: 'madowoaketekazewoireru', jp: '窓を開けて風を入れる', html: '<ruby>窓<rt>まど</rt></ruby>を<ruby>開<rt>あ</rt></ruby>けて<ruby>風<rt>かぜ</rt></ruby>を<ruby>入<rt>い</rt></ruby>れる' },
+    { romaji: 'tomodatitoeigawomiru', jp: '友達と映画を見る', html: '<ruby>友達<rt>ともだち</rt></ruby>と<ruby>映画<rt>えいが</rt></ruby>を<ruby>見<rt>み</rt></ruby>る' },
+    { romaji: 'syukudaiwooetekaraasobu', jp: '宿題を終えてから遊ぶ', html: '<ruby>宿題<rt>しゅくだい</rt></ruby>を<ruby>終<rt>お</rt></ruby>えてから<ruby>遊<rt>あそ</rt></ruby>ぶ' },
+    { romaji: 'amegahurisounanodekasawomotu', jp: '雨が降りそうなので傘を持つ', html: '<ruby>雨<rt>あめ</rt></ruby>が<ruby>降<rt>ふ</rt></ruby>りそうなので<ruby>傘<rt>かさ</rt></ruby>を<ruby>持<rt>も</rt></ruby>つ' },
+    { romaji: 'reizoukonigyuunyuugaaru', jp: '冷蔵庫に牛乳がある', html: '<ruby>冷蔵庫<rt>れいぞうこ</rt></ruby>に<ruby>牛乳<rt>ぎゅうにゅう</rt></ruby>がある' },
+    { romaji: 'ekimadezitensyadeiku', jp: '駅まで自転車で行く', html: '<ruby>駅<rt>えき</rt></ruby>まで<ruby>自転車<rt>じてんしゃ</rt></ruby>で<ruby>行<rt>い</rt></ruby>く' },
+    { romaji: 'tegamiwokaiteposutonidasu', jp: '手紙を書いてポストに出す', html: '<ruby>手紙<rt>てがみ</rt></ruby>を<ruby>書<rt>か</rt></ruby>いてポストに<ruby>出<rt>だ</rt></ruby>す' },
+    { romaji: 'siainikatteuresii', jp: '試合に勝って嬉しい', html: '<ruby>試合<rt>しあい</rt></ruby>に<ruby>勝<rt>か</rt></ruby>って<ruby>嬉<rt>うれ</rt></ruby>しい' },
+    { romaji: 'yorunihosiwonagameru', jp: '夜に星を眺める', html: '<ruby>夜<rt>よる</rt></ruby>に<ruby>星<rt>ほし</rt></ruby>を<ruby>眺<rt>なが</rt></ruby>める' },
+    { romaji: 'kaigisituwoyoyakusuru', jp: '会議室を予約する', html: '<ruby>会議室<rt>かいぎしつ</rt></ruby>を<ruby>予約<rt>よやく</rt></ruby>する' },
+    { romaji: 'sobonoienitomariniiku', jp: '祖母の家に泊まりに行く', html: '<ruby>祖母<rt>そぼ</rt></ruby>の<ruby>家<rt>いえ</rt></ruby>に<ruby>泊<rt>と</rt></ruby>まりに<ruby>行<rt>い</rt></ruby>く' },
+    { romaji: 'tizuwominagaraaruku', jp: '地図を見ながら歩く', html: '<ruby>地図<rt>ちず</rt></ruby>を<ruby>見<rt>み</rt></ruby>ながら<ruby>歩<rt>ある</rt></ruby>く' },
+    { romaji: 'hananimizuwoyaru', jp: '花に水をやる', html: '<ruby>花<rt>はな</rt></ruby>に<ruby>水<rt>みず</rt></ruby>をやる' },
+    { romaji: 'ongakusitudepianowohiku', jp: '音楽室でピアノを弾く', html: '<ruby>音楽室<rt>おんがくしつ</rt></ruby>でピアノを<ruby>弾<rt>ひ</rt></ruby>く' },
+    { romaji: 'saihuwoieniwasureta', jp: '財布を家に忘れた', html: '<ruby>財布<rt>さいふ</rt></ruby>を<ruby>家<rt>いえ</rt></ruby>に<ruby>忘<rt>わす</rt></ruby>れた' },
+    { romaji: 'akihakouyougakireidesu', jp: '秋は紅葉がきれいです', html: '<ruby>秋<rt>あき</rt></ruby>は<ruby>紅葉<rt>こうよう</rt></ruby>がきれいです' },
+    { romaji: 'situmonsurutokihatewoageru', jp: '質問するときは手を挙げる', html: '<ruby>質問<rt>しつもん</rt></ruby>するときは<ruby>手<rt>て</rt></ruby>を<ruby>挙<rt>あ</rt></ruby>げる' },
+    { romaji: 'kinzyonokouenwohasiru', jp: '近所の公園を走る', html: '<ruby>近所<rt>きんじょ</rt></ruby>の<ruby>公園<rt>こうえん</rt></ruby>を<ruby>走<rt>はし</rt></ruby>る' },
+    { romaji: 'syasinwoarubamunisimau', jp: '写真をアルバムにしまう', html: '<ruby>写真<rt>しゃしん</rt></ruby>をアルバムにしまう' },
+    { romaji: 'kazewohiitanodehayakuneru', jp: '風邪をひいたので早く寝る', html: '<ruby>風邪<rt>かぜ</rt></ruby>をひいたので<ruby>早<rt>はや</rt></ruby>く<ruby>寝<rt>ね</rt></ruby>る' },
+    { romaji: 'tanzyoubinikasiwokau', jp: '誕生日にお菓子を買う', html: '<ruby>誕生日<rt>たんじょうび</rt></ruby>に<ruby>お菓子<rt>かし</rt></ruby>を<ruby>買<rt>か</rt></ruby>う' },
+    { romaji: 'singougaaoninattekarawataru', jp: '信号が青になってから渡る', html: '<ruby>信号<rt>しんごう</rt></ruby>が<ruby>青<rt>あお</rt></ruby>になってから<ruby>渡<rt>わた</rt></ruby>る' },
+    { romaji: 'souzikideheyawosouzisuru', jp: '掃除機で部屋を掃除する', html: '<ruby>掃除機<rt>そうじき</rt></ruby>で<ruby>部屋<rt>へや</rt></ruby>を<ruby>掃除<rt>そうじ</rt></ruby>する' },
+    { romaji: 'raisyuunoyoteiwotetyounikaku', jp: '来週の予定を手帳に書く', html: '<ruby>来週<rt>らいしゅう</rt></ruby>の<ruby>予定<rt>よてい</rt></ruby>を<ruby>手帳<rt>てちょう</rt></ruby>に<ruby>書<rt>か</rt></ruby>く' },
+    { romaji: 'onsennnihaittetukarewotoru', jp: '温泉に入って疲れを取る', html: '<ruby>温泉<rt>おんせん</rt></ruby>に<ruby>入<rt>はい</rt></ruby>って<ruby>疲<rt>つか</rt></ruby>れを<ruby>取<rt>と</rt></ruby>る' },
+    { romaji: 'sinbunwoyondeyononakawosiru', jp: '新聞を読んで世の中を知る', html: '<ruby>新聞<rt>しんぶん</rt></ruby>を<ruby>読<rt>よ</rt></ruby>んで<ruby>世<rt>よ</rt></ruby>の<ruby>中<rt>なか</rt></ruby>を<ruby>知<rt>し</rt></ruby>る' },
+    { romaji: 'kyoudaideyuuhanwotukuru', jp: '兄弟で夕飯を作る', html: '<ruby>兄弟<rt>きょうだい</rt></ruby>で<ruby>夕飯<rt>ゆうはん</rt></ruby>を<ruby>作<rt>つく</rt></ruby>る' },
+    { romaji: 'bizyutukandeewomiru', jp: '美術館で絵を見る', html: '<ruby>美術館<rt>びじゅつかん</rt></ruby>で<ruby>絵<rt>え</rt></ruby>を<ruby>見<rt>み</rt></ruby>る' },
+    { romaji: 'yukinoasahasizukadesu', jp: '雪の朝は静かです', html: '<ruby>雪<rt>ゆき</rt></ruby>の<ruby>朝<rt>あさ</rt></ruby>は<ruby>静<rt>しず</rt></ruby>かです' },
+    { romaji: 'bangouwoteikitekinikaeru', jp: '番号を定期的に変える', html: '<ruby>番号<rt>ばんごう</rt></ruby>を<ruby>定期的<rt>ていきてき</rt></ruby>に<ruby>変<rt>か</rt></ruby>える' },
+    { romaji: 'asanoaisatuwowasurenai', jp: '朝のあいさつを忘れない', html: '<ruby>朝<rt>あさ</rt></ruby>のあいさつを<ruby>忘<rt>わす</rt></ruby>れない' },
+    { romaji: 'kyoukasyowohiraitekudasai', jp: '教科書を開いてください', html: '<ruby>教科書<rt>きょうかしょ</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>いてください' },
+    { romaji: 'yuuyakegasorawoakakusomeru', jp: '夕焼けが空を赤く染める', html: '<ruby>夕焼<rt>ゆうや</rt></ruby>けが<ruby>空<rt>そら</rt></ruby>を<ruby>赤<rt>あか</rt></ruby>く<ruby>染<rt>そ</rt></ruby>める' },
+    { romaji: 'kekkawokazokunitutaeru', jp: '結果を家族に伝える', html: '<ruby>結果<rt>けっか</rt></ruby>を<ruby>家族<rt>かぞく</rt></ruby>に<ruby>伝<rt>つた</rt></ruby>える' },
+    { romaji: 'yasaiwokittesaradawotukuru', jp: '野菜を切ってサラダを作る', html: '<ruby>野菜<rt>やさい</rt></ruby>を<ruby>切<rt>き</rt></ruby>ってサラダを<ruby>作<rt>つく</rt></ruby>る' },
+    { romaji: 'asanosanpohakimotigaii', jp: '朝の散歩は気持ちがいい', html: '<ruby>朝<rt>あさ</rt></ruby>の<ruby>散歩<rt>さんぽ</rt></ruby>は<ruby>気持<rt>きも</rt></ruby>ちがいい' }
 ];
 
 let audioCtx;
@@ -106,7 +146,7 @@ let uiTimer = null;
 let breakTimer = null;
 
 let currentWordObj = null;
-let charIndex = 0;
+let typingState = null;
 let trialHistory = [];
 const sessionPhases = [];
 
@@ -470,30 +510,27 @@ function showDone() {
 
 function nextWord() {
     currentWordObj = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
-    charIndex = 0;
+    typingState = RomajiInput.start(currentWordObj);
     renderWord();
 }
 
 function renderWord() {
-    const romaji = currentWordObj.romaji;
-    const typed = romaji.slice(0, charIndex);
-    const current = romaji.charAt(charIndex);
-    const rest = romaji.slice(charIndex + 1);
+    const view = RomajiInput.view(typingState);
     els.romajiDisplay.innerHTML =
-        `<span class="typed-char">${typed}</span>` +
-        `<span class="current-char">${current}</span>` +
-        `<span class="untyped-char">${rest}</span>`;
+        `<span class="typed-char">${view.typed}</span>` +
+        `<span class="current-char">${view.current}</span>` +
+        `<span class="untyped-char">${view.rest}</span>`;
     els.japaneseDisplay.innerHTML = currentWordObj.html;
 }
 
 function checkTyping(key) {
-    if (!blockActive || inputLock) return;
+    if (!blockActive || inputLock || !typingState) return;
     const phase = currentPhase();
     if (phase.kind === 'sound') return;
-    if (key.toLowerCase() !== currentWordObj.romaji[charIndex]) return;
-    charIndex += 1;
+    const result = RomajiInput.type(typingState, key.toLowerCase());
+    if (result === 'reject') return;
     keystrokes += 1;
-    if (charIndex >= currentWordObj.romaji.length) nextWord();
+    if (result === 'done') nextWord();
     else renderWord();
     updateHud();
 }
@@ -533,7 +570,7 @@ document.addEventListener('keydown', (e) => {
         }
         return;
     }
-    if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) checkTyping(e.key);
+    if (e.key.length === 1 && /[a-zA-Z']/.test(e.key)) checkTyping(e.key);
 });
 
 function downloadCsv() {
