@@ -2,18 +2,31 @@
 // 本番セッション
 // 前：文字1分 → 音1分 → 本番20音×3（あいだに休憩）→ 後：文字1分 → 音1分
 // ==========================================
-const NOISE_FILE_PATH = 'assets/noise/kankisen.mp3';
-const NOISE_GAIN = 0.15;
+const NOISE_FILE_PATH = 'assets/noise/kankisen.wav';
+const NOISE_DB = 50;
 const RESPONSE_WINDOW = 2000;
 const BLOCK_MS = 60 * 1000;
 const DUAL_TRIALS = 20;
-const START_DB = 70;
+const FALLBACK_START_DB = 55;
+const START_OFFSET_DB = 20;
 const MAX_DB = 80;
 const MIN_DB = 0;
 const STEP_DOWN = 5;
 const STEP_UP = 10;
 const MIN_DELAY = 3000;
 const MAX_DELAY = 10000;
+
+// Step 1（静寂時の基準聴力測定）で保存した閾値。未測定なら null。
+function loadBaseThresholdDB() {
+    const db = parseFloat(localStorage.getItem('userBaseThresholdDB'));
+    return Number.isFinite(db) ? db : null;
+}
+
+// 各被験者の閾値 + 20 dB から降り始める。固定値 70 では閾値まで 5 試行を空費する。
+function initialDB() {
+    if (baseThresholdDB === null) return FALLBACK_START_DB;
+    return Math.min(MAX_DB, baseThresholdDB + START_OFFSET_DB);
+}
 
 const PHASES = [
     { id: 'pre_typing', kind: 'typing', title: '本番前：文字だけ（1分）' },
@@ -121,7 +134,7 @@ const WORD_LIST = [
 let audioCtx;
 let noiseBuffer = null;
 let noiseSource = null;
-let baseThresholdDB = null;
+let baseThresholdDB = loadBaseThresholdDB();
 
 let phaseIndex = -1;
 let blockActive = false;
@@ -129,7 +142,7 @@ let isWaitingForResponse = false;
 let inputLock = false;
 let stopAfterCurrent = false;
 
-let currentDB = START_DB;
+let currentDB = initialDB();
 let soundsPlayed = 0;
 let keystrokes = 0;
 let blockStart = 0;
@@ -291,7 +304,7 @@ function startBlock() {
     hitCount = 0;
     hitRtSum = 0;
     trialHistory = [];
-    currentDB = START_DB;
+    currentDB = initialDB();
     blockStart = performance.now();
     blockDeadline = blockStart + BLOCK_MS;
 
@@ -331,7 +344,7 @@ function playNoiseLoop() {
     noiseSource.buffer = noiseBuffer;
     noiseSource.loop = true;
     const gain = audioCtx.createGain();
-    gain.gain.value = NOISE_GAIN;
+    gain.gain.value = TONE.noiseDbToGain(NOISE_DB);
     noiseSource.connect(gain).connect(audioCtx.destination);
     noiseSource.start();
 }

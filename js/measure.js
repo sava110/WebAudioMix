@@ -2,7 +2,7 @@
 // 設定・変数
 // ==========================================
 const AUDIO_PATHS = {
-    noise: 'assets/noise/kankisen.mp3'
+    noise: 'assets/noise/kankisen.wav'
 };
 
 const TARGET_FREQ = TONE.FREQ;

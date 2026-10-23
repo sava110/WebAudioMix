@@ -21,7 +21,7 @@ function startRefTone(targetDB) {
     osc.type = TONE.TYPE;
     osc.frequency.value = TONE.FREQ;
 
-    // 本番・測定と同じ式（60dB のデジタルゲインは 0.1）
+    // 本番・測定と同じ式（60dB のデジタルゲインは TONE.ATTEN = 0.07）
     const targetGain = TONE.dbToGain(targetDB);
     gainNode.gain.value = targetGain;
 
