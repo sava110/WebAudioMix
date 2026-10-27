@@ -99,7 +99,7 @@ function fallbackPreferred(moras) {
             return;
         }
         const next = moras[i + 1];
-        const needsBreak = next && next.spells.some((s) => /^[aiueony]/.test(s));
+        const needsBreak = !next || next.spells.some((s) => /^[aiueony]/.test(s));
         mora.preferred = needsBreak ? 'nn' : 'n';
     });
 }
@@ -154,6 +154,12 @@ function pickState(states) {
 }
 
 const RomajiInput = {
+    romajiFor(kana) {
+        const moras = buildMoras(kana);
+        fallbackPreferred(moras);
+        return moras.map((mora) => mora.preferred).join('');
+    },
+
     start(word) {
         const moras = buildMoras(readingOf(word.html));
         if (!assignPreferred(moras, word.romaji)) fallbackPreferred(moras);
