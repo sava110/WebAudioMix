@@ -4,76 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>聴覚注意トレーニング</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+    <script>try { var t = localStorage.getItem('webaudiomix_theme'); if (t && t !== 'auto') document.documentElement.dataset.theme = t; } catch (e) {}</script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="art-stage art-float" data-art="hero" style="max-width:260px;margin:0 auto;"></div>
+            <p class="eyebrow">Auditory attention training</p>
             <h1>聴覚注意トレーニング</h1>
-            <p class="lead">音を聞きながら文字を打つ練習です。<br>上から順番に進めば大丈夫です。</p>
+            <p class="lead">雑音の中で文字を打ちながら、提示される音に反応する課題です。所要時間は全体でおよそ30分です。</p>
         </header>
 
         <div id="stepper" class="stepper" data-current="home"></div>
 
         <div class="panel">
-            <h3>はじめての方は、まずこちら</h3>
-            <div class="art-stage" data-art="screenGuide" style="max-width:300px;margin:0 auto;"></div>
-            <p class="instruction">30秒ほどのアニメーションで、やることを全部お見せします。</p>
-            <button onclick="location.href='howto.html'" class="btn-primary btn-big">▶ やり方をみる</button>
+            <div class="split">
+                <div>
+                    <h3>はじめに操作ガイドを確認してください</h3>
+                    <p class="instruction">
+                        各段階で何をするのかを、図で順に説明します。初めて参加する方は、必ず先に目を通してください。
+                        所要1〜2分で、音は再生されません。
+                    </p>
+                    <div class="btn-row" style="margin-top:18px;">
+                        <button onclick="location.href='howto.html'" class="btn-primary btn-big">操作ガイドを見る</button>
+                    </div>
+                </div>
+                <div class="art-stage"><span style="width:100%;max-width:360px" data-art="overview"></span></div>
+            </div>
         </div>
 
         <div class="panel">
-            <h3>進める順番</h3>
-            <p class="instruction">上の「やり方」を見たら、1 → 2 → 3 の順に押してください。</p>
+            <h3>実施手順</h3>
+            <p class="instruction" style="margin-bottom:16px;">上から順に実施します。STEP 1 は実験者が行います。</p>
             <div class="menu-grid">
                 <button class="menu-card" onclick="location.href='calibrate.html'">
-                    <span class="menu-art" data-art="phoneMeter"></span>
-                    <span class="menu-step">STEP 1</span>
-                    <span class="menu-name">音量を合わせる</span>
-                    <span class="menu-desc">スマホの騒音計アプリで、パソコンの音を 60dB にそろえます。</span>
-                    <span class="menu-time" data-done="calibrate">約3分</span>
+                    <span class="menu-head"><span class="menu-step">STEP 1</span><span class="tag" data-done="calibrate">実験者が実施</span></span>
+                    <span class="menu-art" data-art="soundMeter"></span>
+                    <span class="menu-name">音量校正</span>
+                    <span class="menu-desc">騒音計で外部スピーカーの出力を測り、提示音が 60 dB になるよう PC 側の音量を調整します。</span>
                 </button>
                 <button class="menu-card" onclick="location.href='measure.html'">
+                    <span class="menu-head"><span class="menu-step">STEP 2</span><span class="tag" data-done="measure">被験者が実施</span></span>
                     <span class="menu-art" data-art="listening"></span>
-                    <span class="menu-step">STEP 2</span>
-                    <span class="menu-name">聞こえ方をはかる</span>
-                    <span class="menu-desc">静かな部屋で、あなたにギリギリ聞こえる音の大きさを調べます。</span>
-                    <span class="menu-time" data-done="measure">約3分</span>
+                    <span class="menu-name">聴力測定</span>
+                    <span class="menu-desc">静寂下で提示音を段階的に大きくし、聞こえ始める音圧（閾値）を測定します。所要約3分。</span>
                 </button>
                 <button class="menu-card" onclick="location.href='game.html'">
+                    <span class="menu-head"><span class="menu-step">STEP 3</span><span class="tag" data-done="game">被験者が実施</span></span>
                     <span class="menu-art" data-art="dual"></span>
-                    <span class="menu-step">STEP 3</span>
                     <span class="menu-name">本番セッション</span>
-                    <span class="menu-desc">雑音の中で文字を打ちながら、音が鳴ったらスペースキー。</span>
-                    <span class="menu-time" data-done="game">約25分</span>
+                    <span class="menu-desc">雑音下で打鍵しながら提示音に反応します。休憩を挟んで全8課題、所要約25分。</span>
                 </button>
             </div>
         </div>
 
-        <div class="panel flat">
-            <h3>用意するもの</h3>
-            <div class="how-list">
-                <div class="how-item">
-                    <span class="how-num">1</span>
-                    <span class="how-art" data-art="phoneMeter"></span>
-                    <span class="how-text"><b>騒音計アプリを入れたスマートフォン</b>
-                        <span class="small">STEP 1 の音量合わせだけで使います。</span></span>
+        <div class="cols-2">
+            <div class="panel flat">
+                <h3>実験者が準備する機材</h3>
+                <p class="instruction" style="margin-bottom:14px;">被験者による設定・操作は不要です。</p>
+                <div class="how-list">
+                    <div class="how-item">
+                        <span class="how-num">1</span>
+                        <span class="how-art" data-art="soundMeter"></span>
+                        <span class="how-text"><b>騒音計</b>
+                            <span class="small">マイクは被験者の頭部位置に設置します。校正は STEP 1 でのみ使用します。</span></span>
+                    </div>
+                    <div class="how-item">
+                        <span class="how-num">2</span>
+                        <span class="how-art" data-art="extSpeaker"></span>
+                        <span class="how-text"><b>外部スピーカー</b>
+                            <span class="small">提示音・雑音はすべて外部スピーカーから再生します。PC 内蔵スピーカーおよびイヤホンは使用しません。</span></span>
+                    </div>
                 </div>
-                <div class="how-item">
-                    <span class="how-num">2</span>
-                    <span class="how-art" data-art="speaker"></span>
-                    <span class="how-text"><b>パソコンのスピーカー</b>
-                        <span class="small">イヤホンではなく、スピーカーから音を出してください。</span></span>
-                </div>
-                <div class="how-item">
-                    <span class="how-num">3</span>
-                    <span class="how-art" data-art="typing"></span>
-                    <span class="how-text"><b>キーボード</b>
-                        <span class="small">ローマ字入力で打ちます。日本語入力は OFF のままで大丈夫です。</span></span>
+            </div>
+
+            <div class="panel flat">
+                <h3>被験者が使うもの</h3>
+                <p class="instruction" style="margin-bottom:14px;">席についたら、以下だけ確認してください。</p>
+                <div class="how-list">
+                    <div class="how-item">
+                        <span class="how-num">1</span>
+                        <span class="how-art" data-art="spacebar"></span>
+                        <span class="how-text"><b>キーボード</b>
+                            <span class="small">音への回答はスペースキー、打鍵課題はローマ字入力です。日本語入力（IME）は OFF にしてください。</span></span>
+                    </div>
+                    <div class="how-item no-art">
+                        <span class="how-num">2</span>
+                        <span class="how-text"><b>姿勢・位置</b>
+                            <span class="small">校正時に合わせた位置から大きく動かないでください。スピーカーとの距離が変わると音圧が変わります。</span></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -81,11 +100,11 @@
 
     <script src="js/ui.js"></script>
     <script>
-        // 終わった段階には「すみました」と出す。
+        // 済んだ段階は印を変える。
         document.querySelectorAll('[data-done]').forEach((el) => {
             if (!UI.isDone(el.dataset.done)) return;
-            el.textContent = '✓ すみました';
-            el.className = 'menu-done';
+            el.textContent = '完了';
+            el.className = 'tag ok';
         });
     </script>
 </body>

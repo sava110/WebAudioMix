@@ -3,38 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>やり方をみる</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+    <title>操作ガイド</title>
+    <script>try { var t = localStorage.getItem('webaudiomix_theme'); if (t && t !== 'auto') document.documentElement.dataset.theme = t; } catch (e) {}</script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h2>やり方をみる</h2>
-            <p class="lead">絵で順番に説明します。読まなくても大丈夫です。</p>
+            <p class="eyebrow">Step 0</p>
+            <h2>操作ガイド</h2>
+            <p class="lead">実験の流れと回答方法を順に説明します。矢印キー（← →）でも操作できます。</p>
         </header>
 
         <div id="stepper" class="stepper" data-current="howto"></div>
 
         <div class="movie">
             <div id="movieBar" class="movie-bar"></div>
-            <p id="chapter" class="movie-chapter"></p>
-            <div id="scenes"></div>
-
-            <div id="dots" class="dots"></div>
-            <div class="movie-controls">
-                <button id="btnPrev" class="btn-secondary">◀ もどる</button>
-                <button id="btnPlay" class="btn-secondary">⏸ とめる</button>
-                <button id="btnNext" class="btn-primary">つぎへ ▶</button>
+            <div class="movie-body"><div id="scenes"></div></div>
+            <div class="movie-foot">
+                <div id="dots" class="dots"></div>
+                <div class="movie-controls">
+                    <span id="chapter" class="movie-count"></span>
+                    <button id="btnPrev" class="btn-secondary">戻る</button>
+                    <button id="btnPlay" class="btn-secondary">一時停止</button>
+                    <button id="btnNext" class="btn-secondary">次へ</button>
+                </div>
             </div>
-            <p class="movie-hint">← → キーでも動かせます</p>
         </div>
 
-        <div class="btn-row" style="margin-top:6px;">
-            <button onclick="location.href='index.html'" class="btn-secondary">ホームにもどる</button>
-            <button id="btnGoCalibrate" class="btn-primary">STEP 1 音量を合わせる へ</button>
+        <div class="btn-row end" style="margin-top:18px;">
+            <button onclick="location.href='index.html'" class="btn-secondary">ホームに戻る</button>
+            <button id="btnGoCalibrate" class="btn-primary">STEP 1 音量校正へ</button>
         </div>
     </div>
 

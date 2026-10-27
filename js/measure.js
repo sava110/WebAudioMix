@@ -48,8 +48,8 @@ window.onload = async () => {
         els.loadingPanel.classList.add('hidden');
         els.measurePanel.classList.remove('hidden');
     } catch (err) {
-        els.loadingPanel.innerHTML = '<h3>音を読み込めませんでした</h3>'
-            + '<p class="instruction">ページを再読み込みしても直らないときは、実験者に伝えてください。</p>';
+        els.loadingPanel.innerHTML = '<h3>音声ファイルを読み込めませんでした</h3>'
+            + '<p class="instruction">ページを再読み込みしても解消しない場合は、実験者に申し出てください。</p>';
         els.loadingPanel.className = 'panel';
     }
 };
@@ -93,7 +93,7 @@ async function startMeasurement() {
         acceptingResponse = true;
         showStep(currentDB);
 
-        els.statusBox.textContent = "🔊 いま鳴っています　→　聞こえたらスペースキー";
+        els.statusBox.textContent = "再生中　－　聞こえたらスペースキー";
         els.statusBox.className = "status-box is-playing";
 
         currentVol = TONE.dbToGain(currentDB);
@@ -102,7 +102,7 @@ async function startMeasurement() {
         await playTone(currentVol, TONE_DURATION);
 
         if (!isMeasuring) break;
-        els.statusBox.textContent = "… つぎの音を待っています";
+        els.statusBox.textContent = "待機中";
         els.statusBox.className = "status-box";
 
         await new Promise(resolve => setTimeout(resolve, PAUSE_DURATION * 1000));
@@ -141,9 +141,9 @@ function abortAtCeiling() {
     isMeasuring = false;
     acceptingResponse = false;
     restartFrom = null;
-    els.statusBox.innerHTML = "いちばん大きい音（60 dB）まで上げても、スペースキーが押されませんでした。"
-        + '<span class="instruction" style="display:block;font-size:0.8em;">'
-        + "スピーカーの音量と、キーボードのスペースキーを確かめて、もう一度お願いします。</span>";
+    els.statusBox.innerHTML = "上限の 60 dB まで上昇しましたが、反応がありませんでした。測定を中断します。"
+        + '<span class="instruction" style="display:block;font-size:0.84rem;font-weight:400;">'
+        + "スピーカーの出力とスペースキーの動作を確認し、実験者に申し出てください。</span>";
     els.statusBox.className = "status-box is-error";
     if (els.stepBox) els.stepBox.style.display = "none";
     els.btnStartMeasure.disabled = false;
@@ -186,7 +186,7 @@ function saveAndShowResult(db) {
     if (els.stepBox) els.stepBox.style.display = "none";
 
     const finalStep = (db / DB_STEP) + 1;
-    els.resultValue.innerHTML = `${db} dB　<span style="font-size:0.7em;color:#6b8296;">（${finalStep}段目）</span>`;
+    els.resultValue.innerHTML = `${db} dB　<span style="font-size:0.72rem;" class="instruction">（第 ${finalStep} 段）</span>`;
 
     els.measurePanel.classList.add('hidden');
     els.resultPanel.classList.remove('hidden');

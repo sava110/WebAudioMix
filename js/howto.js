@@ -1,86 +1,76 @@
 // ==========================================
-// やり方ムービー
-// 1場面 = 1メッセージ。絵が主役で、文は補助。
+// 操作ガイド
+// 1場面 = 1項目。図を左、説明を右に置く。
 // ==========================================
-const SCENE_MS = 8000;
-
-const arrow = '<span class="scene-arrow">➜</span>';
+const SCENE_MS = 9000;
 
 const SCENES = [
     {
-        chapter: 'はじめに',
-        art: ['dual'],
-        wide: true,
-        title: '雑音の中で、文字を打ちながら音を聞きます',
-        text: '換気扇のような雑音が流れる中で、キーボードで文字を打ちます。そのあいだに「ピー」という音が時々鳴るので、気づいたら知らせてください。',
-        point: 'かかる時間は、ぜんぶで30分くらいです'
+        chapter: '概要',
+        art: ['overview'],
+        solo: true,
+        title: '雑音下での打鍵と、提示音への反応を同時に行います',
+        text: '換気扇に似た雑音が流れる中で、画面に表示される語をローマ字で入力します。その最中に 1 kHz の短い音（提示音）が不定間隔で鳴るので、気づいたら反応してください。所要時間は全体でおよそ30分です。'
     },
     {
-        chapter: '答えかた',
+        chapter: '回答方法',
         art: ['spacebar'],
-        wide: true,
-        title: '音が聞こえたら、スペースキーを1回',
-        text: 'この実験で音に答える方法は、これだけです。マウスは使いません。小さくても「鳴ったかな？」と思ったら押してください。',
-        point: '音が鳴ってから2秒の間に押してください'
+        solo: true,
+        title: '提示音への回答はスペースキーのみです',
+        text: 'マウスは使用しません。提示音が鳴ってから2秒以内にスペースキーを1回押してください。確信が持てない程度の小さな音でも、聞こえたと感じたら押して構いません。'
     },
     {
         chapter: 'STEP 1',
-        art: ['phoneMeter', 'volumeSlider'],
-        title: 'まず、パソコンの音量を合わせます',
-        text: 'スマートフォンの騒音計アプリをスピーカーの前に置きます。画面の「60dB」ボタンを押したまま、パソコン側の音量つまみを動かして、アプリの数字が60になるようにします。',
-        point: 'ここで合わせた音量は、最後まで変えないでください'
+        art: ['soundMeter', 'extSpeaker'],
+        title: '音量校正は実験者が行います',
+        text: '騒音計のマイクを被験者の頭部位置に設置し、提示音が 60 dB になるよう PC 側の出力音量を調整します。被験者の操作は不要です。校正後は音量設定と着席位置を変更しないでください。'
     },
     {
         chapter: 'STEP 2',
         art: ['beep', 'spacebar'],
-        title: 'つぎに、あなたの聞こえ方をはかります',
-        text: '静かな状態で「ピー」が鳴ります。最初はとても小さく、鳴るたびに少しずつ大きくなります。聞こえたらスペースキーを押してください。',
-        point: '押すと音は小さく戻り、もう一度同じ大きさで聞こえたら終わりです'
+        title: '静寂下で、聞こえ始める音圧を測定します',
+        text: '提示音が約1.5秒間隔で鳴り、1回ごとに 5 dB ずつ大きくなります。聞こえた時点でスペースキーを押してください。押すと音圧が下がり、再び上昇します。同じ音圧で2回反応できた時点で測定は終了します。'
     },
     {
         chapter: 'STEP 3',
         art: ['typing'],
-        wide: true,
-        title: '本番①　画面のお題をローマ字で打ちます',
-        text: '画面に出ている言葉を、下のローマ字どおりに打ってください。打てた文字は色が変わります。打ち終わると次のお題に変わります。',
-        point: '日本語入力（かな入力）はOFFのままにしてください'
+        solo: true,
+        title: '打鍵課題：表示された語をローマ字で入力します',
+        text: '画面中央にローマ字列と読みが表示されます。入力済みの文字は色が変わり、打ち終わると次の語に切り替わります。入力速度は1分あたりの打鍵数（KPM）として記録されます。日本語入力（IME）は OFF のままにしてください。'
     },
     {
         chapter: 'STEP 3',
         art: ['fan', 'beep'],
-        title: '本番②　雑音の中で「ピー」が鳴ります',
-        text: '換気扇のような音がずっと流れます。その中に「ピー」という音がまざって鳴ります。次に鳴るまでの間隔は毎回ちがいます。',
-        point: '雑音はずっと鳴っています。音が止まるのを待たないでください'
+        title: '聴取課題：雑音の中に提示音がまざります',
+        text: '雑音は課題中ずっと鳴り続けます。提示音の間隔は2〜12秒の範囲で毎回変わるため、規則性はありません。雑音が止まるのを待たず、雑音の中の音に注意を向けてください。'
     },
     {
         chapter: 'STEP 3',
         art: ['dual'],
-        wide: true,
-        title: '本番③　打ちながら、音にも答えます',
-        text: '文字を打つ手は止めずに、「ピー」に気づいたらスペースキーを押してください。音が20回鳴ったら、1回ぶんが終わります。',
-        point: 'どちらも大事です。片方だけに集中しなくて大丈夫です'
+        solo: true,
+        title: '本番：両方を同時に行います',
+        text: '打鍵を続けながら、提示音に気づいた時点でスペースキーを押してください。提示音が20回鳴った時点で1ブロックが終了します。どちらか一方に集中する必要はありません。'
     },
     {
-        chapter: 'だいじなこと',
+        chapter: '音圧の制御',
         art: ['louder'],
-        title: 'まちがえても、途中で終わりません',
-        text: '聞き逃したときや、鳴っていないのに押したときは、次の音が10dB大きくなって聞き取りやすくなります。失敗しても続けてください。',
-        point: '気づけたときは、次の音が少し小さくなります'
+        solo: true,
+        title: '反応できなかった場合は、次の音が大きくなります',
+        text: '聞き逃した場合、および音が鳴っていないときに押した場合は、次の提示音が 10 dB 大きくなります。反応できた場合は 5 dB 小さくなります。誤反応によって課題が中断されることはありません。'
     },
     {
-        chapter: 'きゅうけい',
-        art: ['breakTea'],
-        title: '本番は3回。あいだに休憩があります',
-        text: '1回おわるごとに3分の休憩とアンケートがあります。前後には、文字だけ1分・音だけ1分の時間もあります。',
-        point: '休憩中は画面から目をはなして、耳を休めてください'
+        chapter: '休憩',
+        art: ['restTimer'],
+        solo: true,
+        title: '本番は3ブロック。間に休憩があります',
+        text: '1ブロックごとに3分の休憩とアンケートがあります。休憩中は画面から目を離し、聴覚を休めてください。本番の前後には、打鍵のみ1分・聴取のみ1分の課題があります。'
     },
     {
-        chapter: 'じゅんび完了',
-        art: ['celebrate'],
-        wide: true,
-        title: 'これで説明はおわりです',
-        text: '分からなくなったら、各画面の絵と番号を見れば同じ説明が出ています。それでは STEP 1 から始めましょう。',
-        point: '困ったときは実験者に声をかけてください'
+        chapter: '確認',
+        art: ['check'],
+        solo: true,
+        title: '以上で説明は終了です',
+        text: '手順が分からなくなった場合は、各画面上部の図と手順表示に同じ内容が記載されています。進行に不明な点があれば実験者に申し出てください。'
     }
 ];
 
@@ -99,19 +89,21 @@ let raf = null;
 
 scenesHost.innerHTML = SCENES.map((scene, i) => {
     const art = scene.art
-        .map((name) => `<span class="${scene.wide ? 'wide' : ''}">${UI.ART[name]()}</span>`)
-        .join(scene.art.length > 1 ? arrow : '');
+        .map((name) => `<span class="${scene.solo ? 'solo' : ''}">${UI.ART[name]()}</span>`)
+        .join(scene.art.length > 1 ? '<span class="art-arrow">→</span>' : '');
     return `
         <section class="scene ${i === 0 ? 'active' : ''}" data-index="${i}">
             <div class="scene-art">${art}</div>
-            <h2>${scene.title}</h2>
-            <p>${scene.text}</p>
-            ${scene.point ? `<p class="point">${scene.point}</p>` : ''}
+            <div class="scene-text">
+                <p class="eyebrow">${scene.chapter}</p>
+                <h2>${scene.title}</h2>
+                <p>${scene.text}</p>
+            </div>
         </section>`;
 }).join('');
 
 dotsHost.innerHTML = SCENES.map((s, i) =>
-    `<button class="dot" data-go="${i}" aria-label="${i + 1}場面目"></button>`).join('');
+    `<button class="dot" data-go="${i}" aria-label="${i + 1}項目目"></button>`).join('');
 
 function show(next) {
     index = (next + SCENES.length) % SCENES.length;
@@ -122,10 +114,9 @@ function show(next) {
         el.classList.toggle('active', i === index);
         el.classList.toggle('seen', i < index);
     });
-    chapterEl.textContent = `${SCENES[index].chapter}　(${index + 1} / ${SCENES.length})`;
-    btnNext.textContent = index === SCENES.length - 1 ? 'もう一度みる' : 'つぎへ ▶';
+    chapterEl.textContent = `${index + 1} / ${SCENES.length}`;
+    btnNext.textContent = index === SCENES.length - 1 ? '最初に戻る' : '次へ';
     sceneStart = performance.now();
-    // 最後まで見た人は進行バーに印をつける。
     if (index === SCENES.length - 1) UI.markDone('howto');
 }
 
@@ -141,13 +132,13 @@ function tick() {
 
 function setPlaying(on) {
     playing = on;
-    btnPlay.textContent = on ? '⏸ とめる' : '▶ じどうで進む';
+    btnPlay.textContent = on ? '一時停止' : '自動再生';
     sceneStart = performance.now();
     if (!on) barEl.style.width = '0';
 }
 
-btnNext.addEventListener('click', () => { show(index + 1); sceneStart = performance.now(); });
-btnPrev.addEventListener('click', () => { show(index - 1); sceneStart = performance.now(); });
+btnNext.addEventListener('click', () => show(index + 1));
+btnPrev.addEventListener('click', () => show(index - 1));
 btnPlay.addEventListener('click', () => setPlaying(!playing));
 dotsHost.addEventListener('click', (e) => {
     const go = e.target.dataset.go;

@@ -3,84 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>STEP 1: 音量を合わせる</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+    <title>STEP 1: 音量校正</title>
+    <script>try { var t = localStorage.getItem('webaudiomix_theme'); if (t && t !== 'auto') document.documentElement.dataset.theme = t; } catch (e) {}</script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h2>STEP 1　音量を合わせる</h2>
-            <p class="lead">パソコンの音の大きさを、全員同じにそろえます。</p>
+            <p class="eyebrow">Step 1</p>
+            <h2>音量校正</h2>
+            <p class="lead">外部スピーカーの出力を騒音計で測り、提示音が 60 dB になるよう調整します。<strong>この作業は実験者が行います。</strong></p>
         </header>
 
         <div id="stepper" class="stepper" data-current="calibrate"></div>
 
         <div class="panel">
-            <div class="art-stage">
-                <span style="width:150px" data-art="phoneMeter"></span>
-                <span class="scene-arrow">➜</span>
-                <span style="width:170px" data-art="volumeSlider"></span>
-            </div>
+            <div class="split wide-left">
+                <div>
+                    <h3>校正手順</h3>
+                    <div class="how-list cards cols-2">
+                        <div class="how-item">
+                            <span class="how-num">1</span>
+                            <span class="how-art" data-art="soundMeter"></span>
+                            <span class="how-text"><b>騒音計を設置する</b>
+                                <span class="small">マイクを被験者の頭部位置に置き、スピーカー正面へ向けます。以降この位置は動かしません。</span></span>
+                        </div>
+                        <div class="how-item">
+                            <span class="how-num">2</span>
+                            <span class="how-art" data-art="extSpeaker"></span>
+                            <span class="how-text"><b>60 dB を再生する</b>
+                                <span class="small">右の「60 dB 再生」を押します。停止するまで 1 kHz の純音が連続再生されます。</span></span>
+                        </div>
+                        <div class="how-item">
+                            <span class="how-num">3</span>
+                            <span class="how-art" data-art="volumeSlider"></span>
+                            <span class="how-text"><b>PC の出力音量で合わせる</b>
+                                <span class="small">画面上のボタンは音量を変えません。PC 本体の出力音量を操作し、騒音計の表示を 60 dB にします。</span></span>
+                        </div>
+                        <div class="how-item">
+                            <span class="how-num">4</span>
+                            <span class="how-art" data-art="check"></span>
+                            <span class="how-text"><b>50 dB で線形性を確認する</b>
+                                <span class="small">「50 dB 再生」で騒音計が 50 dB（±1 dB）を示せば正常です。以降は音量設定を変更しません。</span></span>
+                        </div>
+                    </div>
+                </div>
 
-            <h3>この4つをやるだけです</h3>
-            <div class="how-list">
-                <div class="how-item">
-                    <span class="how-num">1</span>
-                    <span class="how-art" data-art="phoneMeter"></span>
-                    <span class="how-text"><b>スマホの騒音計アプリを開く</b>
-                        <span class="small">マイクをパソコンのスピーカーに向けて、すぐ前に置きます。</span></span>
-                </div>
-                <div class="how-item">
-                    <span class="how-num">2</span>
-                    <span class="how-art" data-art="speaker"></span>
-                    <span class="how-text"><b>下の「60dB を鳴らす」を押す</b>
-                        <span class="small">「ピー」という音が鳴り続けます。止めるまで鳴ります。</span></span>
-                </div>
-                <div class="how-item">
-                    <span class="how-num">3</span>
-                    <span class="how-art" data-art="volumeSlider"></span>
-                    <span class="how-text"><b>パソコンの音量つまみで 60 に合わせる</b>
-                        <span class="small">画面のボタンではなく、パソコン本体の音量を動かします。アプリの数字が <b>60</b> になればOK。</span></span>
-                </div>
-                <div class="how-item">
-                    <span class="how-num">4</span>
-                    <span class="how-art" data-art="check"></span>
-                    <span class="how-text"><b>「50dB を鳴らす」で確認する</b>
-                        <span class="small">アプリの数字が <b>50</b>（±1）になれば成功です。音量つまみはもう動かさないでください。</span></span>
+                <div>
+                    <h3>再生</h3>
+                    <div id="statusBox" class="status-box">停止中</div>
+                    <div class="btn-row">
+                        <button id="btn60dB" class="btn-primary btn-big">60 dB 再生</button>
+                        <button id="btn50dB" class="btn-secondary btn-big">50 dB 再生</button>
+                    </div>
+                    <button id="btnStop" class="btn-danger btn-block" style="margin-top:12px;">停止</button>
+                    <p class="note">
+                        この音は本番と同一のデジタル音量です。<b>以前の音量設定のままでは一致しません。</b>
+                        毎回この画面で合わせ直してください。
+                    </p>
                 </div>
             </div>
-
-            <div id="statusBox" class="status-box">まだ音は鳴っていません</div>
-
-            <div class="btn-row">
-                <button id="btn60dB" class="btn-primary btn-big">🔊 60dB を鳴らす</button>
-                <button id="btn50dB" class="btn-secondary btn-big">🔉 50dB を鳴らす</button>
-            </div>
-            <button id="btnStop" class="btn-danger btn-block" style="max-width:320px;margin:10px auto 0;">■ 音を止める</button>
         </div>
 
         <div class="panel flat">
-            <h3>うまくいかないとき</h3>
-            <div class="how-list">
-                <div class="how-item" style="grid-template-columns:44px 1fr;">
+            <h3>確認事項</h3>
+            <div class="how-list cols-2">
+                <div class="how-item no-art">
                     <span class="how-num">?</span>
-                    <span class="how-text"><b>60 にならない</b>
-                        <span class="small">パソコンの音量を上げ下げしてください。画面の 60dB ボタンは音量を変えません。</span></span>
+                    <span class="how-text"><b>60 dB にならない</b>
+                        <span class="small">PC 本体の出力音量を上下させてください。画面上の「60 dB 再生」はデジタル音量を変更しません。スピーカー側のボリュームが中間位置にあるかも確認します。</span></span>
                 </div>
-                <div class="how-item" style="grid-template-columns:44px 1fr;">
+                <div class="how-item no-art">
                     <span class="how-num">?</span>
-                    <span class="how-text"><b>50dB で 50 にならない</b>
-                        <span class="small">まわりが静かか確認して、もう一度 60dB から合わせ直してください。それでもずれる場合は実験者に伝えてください。</span></span>
+                    <span class="how-text"><b>50 dB 再生で 50 dB にならない</b>
+                        <span class="small">暗騒音が高い可能性があります。室内を静かにしたうえで 60 dB から再調整してください。差が 1 dB を超える場合は再生系の線形性を確認します。</span></span>
                 </div>
             </div>
         </div>
 
-        <div class="btn-row">
-            <button onclick="location.href='index.html'" class="btn-secondary">ホームにもどる</button>
-            <button id="btnNextStep" class="btn-primary btn-big">できた！ STEP 2 へ ▶</button>
+        <div class="btn-row end">
+            <button onclick="location.href='index.html'" class="btn-secondary">ホームに戻る</button>
+            <button id="btnNextStep" class="btn-primary btn-big">校正完了　STEP 2 へ</button>
         </div>
     </div>
 

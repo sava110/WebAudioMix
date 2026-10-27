@@ -33,9 +33,9 @@ function startRefTone(targetDB) {
     osc.connect(gainNode).connect(audioCtx.destination);
     osc.start();
 
-    status.innerHTML = `🔊 いま <b>${targetDB}dB</b> の音が鳴っています`
-        + `<span class="instruction" style="display:block;font-size:0.72em;">`
-        + `アプリの数字が ${targetDB} になるまで、パソコンの音量を動かしてください（gain ${targetGain.toFixed(4)}）</span>`;
+    status.innerHTML = `再生中　<b>${targetDB} dB</b>`
+        + `<span class="instruction" style="display:block;font-size:0.8rem;font-weight:400;">`
+        + `騒音計が ${targetDB} dB を示すまで PC の出力音量を調整（gain ${targetGain.toFixed(4)}）</span>`;
     status.className = 'status-box is-playing';
 }
 
@@ -45,6 +45,6 @@ function stopTone() {
         osc.disconnect();
         osc = null;
     }
-    status.textContent = "音は止まっています";
+    status.textContent = "停止中";
     status.className = 'status-box';
 }
