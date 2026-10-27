@@ -2,42 +2,83 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>聴力測定 (Calibration)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>STEP 2: 聞こえ方をはかる</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h2>Step 1: 基準聴力の測定</h2>
+            <h2>STEP 2　聞こえ方をはかる</h2>
+            <p class="lead">あなたにギリギリ聞こえる音の大きさを調べます。</p>
         </header>
 
+        <div id="stepper" class="stepper" data-current="measure"></div>
+
         <div id="loadingPanel" class="panel">
-            <h3>準備中...</h3>
-            <p>音声ファイルを読み込んでいます。</p>
+            <div class="spinner"></div>
+            <h3>準備中…</h3>
+            <p class="instruction">音のファイルを読み込んでいます。少しお待ちください。</p>
         </div>
 
         <div id="measurePanel" class="panel hidden">
-            <h3>静寂時閾値の測定</h3>
-            <p>
-                開始すると、一定の間隔で「ピー」という音が大きくなります。<br>
-                聞こえ始めたら、すぐに<strong>スペースキー</strong>を押してください。<br>
-                その後に3段階音が小さくなり、再度測定が行われますが同様に聞こえたらスペースキーを押してください。<br>
-                音の下限は 0 dB です。いちばん大きい音でも押されなかったときは、測定を中断します。<br>
-            </p>
+            <div class="art-stage">
+                <span style="width:160px" data-art="beep"></span>
+                <span class="scene-arrow">➜</span>
+                <span style="width:200px" data-art="spacebar"></span>
+            </div>
 
-            <div class="status-box" id="statusBox">待機中</div>
-            <div id="stepCounter" style="font-size: 6em; font-weight: bold; display: none; text-align: center; margin: 20px 0; color: #f1c40f;">1</div>
+            <h3>やることは1つ：聞こえたらスペースキー</h3>
+            <div class="how-list">
+                <div class="how-item">
+                    <span class="how-num">1</span>
+                    <span class="how-art" data-art="listening"></span>
+                    <span class="how-text"><b>とても小さい音から始まります</b>
+                        <span class="small">「ピー」が1秒半おきに鳴り、鳴るたびに少しずつ大きくなります。</span></span>
+                </div>
+                <div class="how-item">
+                    <span class="how-num">2</span>
+                    <span class="how-art" data-art="spacebar"></span>
+                    <span class="how-text"><b>聞こえた瞬間にスペースキー</b>
+                        <span class="small">「鳴ったかな？」と思ったくらいでも押してください。</span></span>
+                </div>
+                <div class="how-item">
+                    <span class="how-num">3</span>
+                    <span class="how-art" data-art="check"></span>
+                    <span class="how-text"><b>押すと音は小さく戻り、もう一度上がっていきます</b>
+                        <span class="small">同じ大きさで2回押せたら、そこがあなたの値になります。</span></span>
+                </div>
+            </div>
 
-            <button id="btnStartMeasure" class="btn-primary">測定開始</button>
+            <p class="instruction">始まるまで2秒あります。部屋を静かにして待ってください。</p>
+
+            <div class="status-box" id="statusBox">「測定開始」を押すと始まります</div>
+
+            <div id="stepBox" class="big-step">
+                <div class="big-step-label">音の大きさ（だんだん大きくなります）</div>
+                <div id="stepCounter" class="big-step-value">1</div>
+                <div id="stepMeter" class="big-step-meter"></div>
+            </div>
+
+            <button id="btnStartMeasure" class="btn-primary btn-big">測定開始</button>
         </div>
 
         <div id="resultPanel" class="panel hidden">
-            <h3>測定完了</h3>
-            <p>あなたの閾値: <strong id="resultValue" style="font-size:1.5em; color:#f1c40f;">---</strong></p>
-            <p>データを保存しました。次に進んでください。</p>
-            <button onclick="location.href='game.html'" class="btn-primary">Step 2: トレーニングへ進む</button>
+            <div class="art-stage" data-art="check" style="max-width:150px;margin:0 auto;"></div>
+            <h3>測定できました</h3>
+            <p>あなたの聞こえ始める大きさ：<br><strong id="resultValue" style="font-size:1.4em;">---</strong></p>
+            <p class="instruction">この値は自動で保存しました。そのまま次へ進んでください。</p>
+            <div class="btn-row">
+                <button onclick="location.href='index.html'" class="btn-secondary">ホームにもどる</button>
+                <button onclick="location.href='game.html'" class="btn-primary btn-big">STEP 3 本番セッション へ ▶</button>
+            </div>
         </div>
     </div>
+
+    <script src="js/ui.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/measure.js"></script>
 </body>

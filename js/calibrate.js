@@ -8,6 +8,11 @@ const status = document.getElementById('statusBox');
 document.getElementById('btn60dB').addEventListener('click', () => startRefTone(60));
 document.getElementById('btn50dB').addEventListener('click', () => startRefTone(50));
 document.getElementById('btnStop').addEventListener('click', stopTone);
+document.getElementById('btnNextStep').addEventListener('click', () => {
+    stopTone();
+    UI.markDone('calibrate');
+    location.href = 'measure.html';
+});
 
 function startRefTone(targetDB) {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -28,9 +33,10 @@ function startRefTone(targetDB) {
     osc.connect(gainNode).connect(audioCtx.destination);
     osc.start();
 
-    status.textContent = `再生中: ${targetDB}dB モード (Gain: ${targetGain.toFixed(4)})`;
-    status.style.background = "#fff3cd";
-    status.style.color = "#856404";
+    status.innerHTML = `🔊 いま <b>${targetDB}dB</b> の音が鳴っています`
+        + `<span class="instruction" style="display:block;font-size:0.72em;">`
+        + `アプリの数字が ${targetDB} になるまで、パソコンの音量を動かしてください（gain ${targetGain.toFixed(4)}）</span>`;
+    status.className = 'status-box is-playing';
 }
 
 function stopTone() {
@@ -39,7 +45,6 @@ function stopTone() {
         osc.disconnect();
         osc = null;
     }
-    status.textContent = "停止中";
-    status.style.background = "#22303f";
-    status.style.color = "#ecf0f1";
+    status.textContent = "音は止まっています";
+    status.className = 'status-box';
 }

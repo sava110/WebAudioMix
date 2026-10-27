@@ -1,55 +1,179 @@
-/* style.css */
+/* ==========================================
+   style.css
+   白背景・イラスト中心の「説明ムービー」風テーマ。
+   初めての被験者が読まずに分かることを優先する。
+   ========================================== */
+
+:root {
+    --blue: #00a0e9;
+    --blue-dark: #0b7cb5;
+    --blue-pale: #e8f6fe;
+    --ink: #2b3a46;
+    --sub: #6b8296;
+    --line: #d9e6ef;
+    --panel: #ffffff;
+    --tint: #f4fafd;
+    --yellow: #ffc93c;
+    --yellow-pale: #fff6dd;
+    --green: #35c47a;
+    --green-pale: #e5f8ee;
+    --red: #ff6b6b;
+    --red-pale: #ffecec;
+    --radius: 22px;
+    --shadow: 0 10px 24px rgba(23, 86, 120, 0.10);
+    --shadow-lift: 0 16px 32px rgba(23, 86, 120, 0.18);
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
 body {
-    font-family: "Hiragino Sans", "Yu Gothic", "Helvetica Neue", Arial, sans-serif;
-    background-color: #2c3e50;
-    color: #ecf0f1;
+    font-family: "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans",
+                 "Yu Gothic UI", "Yu Gothic", "Meiryo", sans-serif;
+    background-color: #ffffff;
+    /* うすい水色の空気感。白背景のままだとカードの輪郭が消える。 */
+    background-image:
+        radial-gradient(900px 420px at 12% -8%, #eaf7fe 0%, rgba(255,255,255,0) 70%),
+        radial-gradient(760px 420px at 92% 4%, #f1fbff 0%, rgba(255,255,255,0) 72%);
+    background-repeat: no-repeat;
+    color: var(--ink);
     text-align: center;
-    padding: 20px;
+    font-size: 17px;
+    line-height: 1.85;
+    margin: 0;
+    padding: 28px 20px 64px;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 880px;
     margin: 0 auto;
 }
 
+/* ==========================================
+   見出し
+   ========================================== */
 header {
-    margin-bottom: 20px;
-    border-bottom: 2px solid #34495e;
-    padding-bottom: 10px;
+    margin-bottom: 22px;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
+h1, h2, h3 {
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+    margin: 0 0 10px;
+}
+
+h1 { font-size: 2.1em; }
+h2 { font-size: 1.6em; }
+h3 { font-size: 1.28em; }
+
+.page-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: center;
+}
+
+.page-title svg { flex: none; }
+
+.lead {
+    color: var(--sub);
+    margin: 0 auto;
+    max-width: 30em;
+}
+
+/* ==========================================
+   パネル（カード）
+   ========================================== */
 .panel {
-    background: #34495e;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    margin-bottom: 20px;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    padding: 30px 28px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+    animation: panel-in 0.42s cubic-bezier(0.22, 1.2, 0.4, 1) both;
+}
+
+@keyframes panel-in {
+    from { opacity: 0; transform: translateY(14px) scale(0.985); }
+    to   { opacity: 1; transform: none; }
+}
+
+.panel.flat {
+    background: var(--tint);
+    box-shadow: none;
 }
 
 .hidden { display: none !important; }
 
-/* ボタン共通 */
-button {
-    padding: 12px 25px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.2s;
-    margin: 10px;
+.instruction {
+    color: var(--sub);
+    font-size: 0.97em;
 }
+
+strong { color: var(--blue-dark); }
+
+/* ==========================================
+   ボタン（Wii のメニュー風のふくらんだ丸ボタン）
+   ========================================== */
+button {
+    font-family: inherit;
+    padding: 15px 30px;
+    font-size: 1.02em;
+    border-radius: 999px;
+    border: 2px solid var(--line);
+    background: linear-gradient(#ffffff, #eef5fa);
+    color: var(--blue-dark);
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    transition: transform 0.16s cubic-bezier(0.22, 1.2, 0.4, 1), box-shadow 0.16s, background 0.16s, border-color 0.16s;
+    margin: 8px;
+    box-shadow: 0 5px 0 rgba(23, 86, 120, 0.10), var(--shadow);
+}
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 0 rgba(23, 86, 120, 0.10), var(--shadow-lift);
+}
+button:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(23, 86, 120, 0.10); }
 button:focus-visible {
-    outline: 3px solid #f1c40f;
+    outline: 4px solid var(--yellow);
     outline-offset: 3px;
 }
-.btn-primary { background-color: #27ae60; color: white; }
-.btn-primary:hover { background-color: #2ecc71; }
-.btn-primary:disabled { background-color: #7f8c8d; cursor: not-allowed; }
-.btn-secondary { background-color: #3d5a73; color: white; }
-.btn-secondary:hover { background-color: #4e6d89; }
-.btn-danger { background-color: #c0392b; color: white; }
-.btn-danger:hover { background-color: #e74c3c; }
+
+.btn-primary {
+    background: linear-gradient(#36bdf7, var(--blue));
+    border-color: #0b8fd0;
+    color: #ffffff;
+    box-shadow: 0 5px 0 #0b7cb5, 0 12px 22px rgba(0, 140, 205, 0.32);
+}
+.btn-primary:hover {
+    background: linear-gradient(#52c9fa, #0aaaf0);
+    box-shadow: 0 8px 0 #0b7cb5, 0 18px 30px rgba(0, 140, 205, 0.36);
+}
+.btn-primary:active { box-shadow: 0 2px 0 #0b7cb5; }
+.btn-primary:disabled {
+    background: linear-gradient(#f3f7fa, #e6edf2);
+    border-color: var(--line);
+    color: #a9bccb;
+    box-shadow: 0 5px 0 rgba(23, 86, 120, 0.06);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary { background: linear-gradient(#ffffff, #eef5fa); color: var(--blue-dark); }
+
+.btn-danger {
+    background: linear-gradient(#ffffff, #fff1f1);
+    border-color: #f6c9c9;
+    color: #d84a4a;
+    box-shadow: 0 5px 0 rgba(216, 74, 74, 0.14), var(--shadow);
+}
+.btn-danger:hover { background: linear-gradient(#fffafa, #ffe3e3); }
+
 .btn-block {
     display: block;
     width: 100%;
@@ -57,93 +181,722 @@ button:focus-visible {
     margin-right: 0;
 }
 
-/* 測定用ステータス */
-.status-box {
-    background: #22303f;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 5px;
-    border: 1px solid #7f8c8d;
-    font-size: 1.2em;
-    font-weight: bold;
+.btn-big { font-size: 1.18em; padding: 19px 44px; }
+
+.btn-row {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-/* ゲーム用ヘッダー情報 */
+/* ==========================================
+   進行バー（いま何番目か）
+   ========================================== */
+.stepper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 6px;
+    margin: 0 auto 26px;
+    max-width: 680px;
+}
+.stepper-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    width: 120px;
+    color: var(--sub);
+    font-size: 0.84em;
+    line-height: 1.4;
+    text-decoration: none;
+}
+.stepper-dot {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 3px solid var(--line);
+    background: #ffffff;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 1.02rem;
+    color: #a9bccb;
+    transition: 0.25s;
+}
+.stepper-item.done .stepper-dot {
+    border-color: var(--green);
+    background: var(--green);
+    color: #ffffff;
+}
+.stepper-item.done { color: var(--green); }
+.stepper-item.current .stepper-dot {
+    border-color: var(--blue);
+    background: var(--blue);
+    color: #ffffff;
+    box-shadow: 0 0 0 6px var(--blue-pale);
+    animation: dot-pulse 1.8s ease-in-out infinite;
+}
+.stepper-item.current { color: var(--blue-dark); font-weight: 700; }
+.stepper-line {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--line);
+    margin-top: 22px;
+    min-width: 12px;
+}
+.stepper-line.done { background: var(--green); }
+
+@keyframes dot-pulse {
+    0%, 100% { box-shadow: 0 0 0 6px var(--blue-pale); }
+    50%      { box-shadow: 0 0 0 12px rgba(0, 160, 233, 0.12); }
+}
+
+/* ==========================================
+   説明カード（番号つき・イラスト入り）
+   ========================================== */
+.how-list {
+    display: grid;
+    gap: 16px;
+    margin: 24px 0;
+    text-align: left;
+}
+.how-item {
+    display: grid;
+    grid-template-columns: 44px 112px 1fr;
+    align-items: center;
+    gap: 16px;
+    background: var(--tint);
+    border: 2px solid var(--line);
+    border-radius: 18px;
+    padding: 14px 18px;
+    animation: panel-in 0.5s cubic-bezier(0.22, 1.2, 0.4, 1) both;
+}
+.how-item:nth-child(2) { animation-delay: 0.08s; }
+.how-item:nth-child(3) { animation-delay: 0.16s; }
+.how-item:nth-child(4) { animation-delay: 0.24s; }
+.how-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: #fff;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 0 #0b7cb5;
+}
+.how-art {
+    width: 112px;
+    height: 92px;
+    display: grid;
+    place-items: center;
+}
+.how-art svg { width: 100%; height: 100%; }
+.how-text { font-size: 0.99em; }
+.how-text b { color: var(--blue-dark); }
+.how-text .small { display: block; color: var(--sub); font-size: 0.88em; }
+
+/* ==========================================
+   大きなイラスト置き場
+   ========================================== */
+.art-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 6px 0 2px;
+}
+.art-stage > span { display: block; }
+.art-stage svg { max-width: 100%; height: auto; }
+.art-float { animation: float 3.6s ease-in-out infinite; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-7px); }
+}
+
+/* ==========================================
+   メニュー（ホームの大きな選択カード）
+   ========================================== */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 18px;
+    margin-top: 6px;
+}
+.menu-card {
+    appearance: none;
+    margin: 0;
+    padding: 22px 18px 20px;
+    border-radius: 20px;
+    border: 2px solid var(--line);
+    background: #ffffff;
+    box-shadow: 0 6px 0 rgba(23, 86, 120, 0.08), var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+    color: var(--ink);
+}
+.menu-card:hover { border-color: var(--blue); }
+.menu-card .menu-art { width: 128px; height: 104px; }
+.menu-card .menu-art svg { width: 100%; height: 100%; }
+.menu-card .menu-step {
+    color: var(--blue);
+    font-size: 0.82em;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+.menu-card .menu-name { font-size: 1.12em; font-weight: 800; }
+.menu-card .menu-desc { color: var(--sub); font-size: 0.88em; font-weight: 500; line-height: 1.6; }
+.menu-card .menu-time {
+    color: var(--blue-dark);
+    background: var(--blue-pale);
+    border-radius: 999px;
+    padding: 2px 12px;
+    font-size: 0.8em;
+}
+.menu-card .menu-done {
+    color: var(--green);
+    background: var(--green-pale);
+    border-radius: 999px;
+    padding: 2px 12px;
+    font-size: 0.8em;
+}
+
+/* ==========================================
+   吹き出し（キャラのセリフ・状態表示）
+   ========================================== */
+.bubble {
+    position: relative;
+    display: inline-block;
+    background: var(--yellow-pale);
+    border: 2px solid #f3dca2;
+    color: #8a6500;
+    border-radius: 18px;
+    padding: 14px 22px;
+    font-weight: 700;
+    max-width: 34em;
+}
+.bubble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -11px;
+    transform: translateX(-50%);
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-top: 11px solid var(--yellow-pale);
+}
+
+/* ==========================================
+   状態表示（測定・校正）
+   ========================================== */
+.status-box {
+    background: var(--tint);
+    color: var(--ink);
+    padding: 18px 20px;
+    margin: 20px 0;
+    border-radius: 16px;
+    border: 2px solid var(--line);
+    font-size: 1.12em;
+    font-weight: 700;
+    transition: 0.25s;
+}
+.status-box.is-playing {
+    background: var(--yellow-pale);
+    border-color: #f3dca2;
+    color: #8a6500;
+}
+.status-box.is-ok {
+    background: var(--green-pale);
+    border-color: #b6e9cd;
+    color: #1d8a55;
+}
+.status-box.is-error {
+    background: var(--red-pale);
+    border-color: #f8c9c9;
+    color: #c0392b;
+}
+
+/* 読み込み状況 */
+.load-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 auto 18px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: var(--tint);
+    border: 2px solid var(--line);
+    color: var(--sub);
+    font-size: 0.92em;
+    font-weight: 700;
+}
+
+/* ==========================================
+   ゲーム中のヘッダー情報
+   ========================================== */
 .game-header {
     display: flex;
-    justify-content: space-around;
-    background: #22303f;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: transparent;
+    padding: 0;
+    margin-bottom: 18px;
 }
-.stat-box { display: flex; flex-direction: column; }
-.stat-box .label { font-size: 0.8em; color: #bdc3c7; }
-.stat-box .value { font-size: 1.15em; font-weight: bold; color: #d5dde6; }
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 150px;
+    background: var(--tint);
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    padding: 10px 16px;
+}
+.stat-box .icon { height: 26px; }
+.stat-box .label { font-size: 0.8em; color: var(--sub); font-weight: 700; }
+.stat-box .value { font-size: 1.32em; font-weight: 800; color: var(--blue-dark); font-variant-numeric: tabular-nums; }
 
-/* タイピングエリア */
+/* ==========================================
+   タイピングエリア
+   ========================================== */
 .typing-area {
-    background: #22303f;
-    padding: 30px;
-    border-radius: 8px;
-    border: 2px solid #3e5871;
-    margin-bottom: 20px;
+    background: #ffffff;
+    padding: 26px 24px 30px;
+    border-radius: 20px;
+    border: 3px solid var(--blue-pale);
+    box-shadow: inset 0 2px 0 #fff, var(--shadow);
+    margin-bottom: 18px;
 }
 .romaji-display {
-    font-family: 'Courier New', monospace;
-    font-size: 32px; /* 少し小さく調整 */
-    font-weight: bold;
+    font-family: "SFMono-Regular", "Consolas", "Courier New", monospace;
+    font-size: 34px;
+    font-weight: 700;
     letter-spacing: 2px;
     min-height: 50px;
     word-break: break-all;
 }
 .japanese-display {
-    font-size: 24px;
-    color: #d5dde6;
+    font-size: 26px;
+    color: var(--ink);
     margin-top: 14px;
     line-height: 2.6;
+    font-weight: 700;
 }
-.japanese-display ruby {
-    ruby-position: over;
-}
+.japanese-display ruby { ruby-position: over; }
 .japanese-display rt {
     font-size: 0.45em;
     line-height: 1;
-    color: #f7dc6f;
+    color: var(--blue);
+    font-weight: 700;
 }
-.typed-char { color: #7f8c9a; }
+.typed-char { color: #bcccd8; }
 .current-char {
-    color: #1c2833;
-    background: #f1c40f;
-    border-radius: 4px;
-    padding: 0 3px;
+    color: #ffffff;
+    background: var(--blue);
+    border-radius: 6px;
+    padding: 0 4px;
+    box-shadow: 0 3px 0 #0b7cb5;
 }
-.untyped-char { color: #ecf0f1; }
+.untyped-char { color: var(--ink); }
+
 .step-label {
-    margin: 0 0 8px;
-    color: #f1c40f;
-    font-size: 0.95em;
+    margin: 0 0 10px;
+    display: inline-block;
+    color: var(--blue-dark);
+    background: var(--blue-pale);
+    border-radius: 999px;
+    padding: 3px 16px;
+    font-size: 0.86em;
+    font-weight: 800;
     letter-spacing: 0.04em;
 }
+
+/* ==========================================
+   休憩
+   ========================================== */
 .break-clock {
-    font-size: 3.2em;
-    font-weight: bold;
-    margin: 10px 0 0;
-    color: #f1c40f;
+    font-size: 3.4em;
+    font-weight: 800;
+    margin: 6px 0 0;
+    color: var(--blue-dark);
+    font-variant-numeric: tabular-nums;
 }
 
-/* 聴覚フィードバック */
+/* ==========================================
+   聴覚フィードバック（回答後に出る大きな表示）
+   ========================================== */
 #hearingFeedback {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px 25px;
-    border-radius: 8px;
-    font-weight: bold;
+    top: 24px;
+    left: 50%;
+    transform: translate(-50%, -16px) scale(0.92);
+    padding: 16px 34px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 1.25em;
+    line-height: 1.5;
     opacity: 0;
-    transition: opacity 0.3s;
+    pointer-events: none;
+    transition: opacity 0.22s, transform 0.22s cubic-bezier(0.22, 1.2, 0.4, 1);
     z-index: 100;
+    border: 3px solid #ffffff;
+    box-shadow: var(--shadow-lift);
 }
-.feedback-visible { opacity: 1 !important; }
-.fb-good { background-color: #27ae60; color: white; }
-.fb-miss { background-color: #c0392b; color: white; }
+.feedback-visible { opacity: 1 !important; transform: translate(-50%, 0) scale(1) !important; }
+.fb-good { background: var(--green); color: #ffffff; }
+.fb-miss { background: var(--red); color: #ffffff; }
+
+/* ==========================================
+   アニメーション部品（SVG の中で使う）
+   ========================================== */
+.spin { animation: spin 2.4s linear infinite; transform-origin: center; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.wave { animation: wave 1.6s ease-out infinite; transform-origin: center; }
+.wave-2 { animation-delay: 0.32s; }
+.wave-3 { animation-delay: 0.64s; }
+@keyframes wave {
+    0%   { opacity: 0;   transform: scale(0.55); }
+    35%  { opacity: 0.95; }
+    100% { opacity: 0;   transform: scale(1.35); }
+}
+
+.blink { animation: blink 1.3s ease-in-out infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+.press { animation: press 1.5s ease-in-out infinite; }
+@keyframes press {
+    0%, 55%, 100% { transform: translateY(0); }
+    68%           { transform: translateY(5px); }
+}
+
+.bob { animation: bob 2.2s ease-in-out infinite; transform-origin: center; }
+@keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-5px) rotate(-3deg); }
+}
+
+.needle { animation: needle 3.4s ease-in-out infinite; transform-origin: 60px 64px; }
+@keyframes needle {
+    0%, 100% { transform: rotate(-38deg); }
+    45%, 60% { transform: rotate(6deg); }
+}
+
+.type-hand { animation: type-hand 0.9s ease-in-out infinite; transform-origin: center; }
+@keyframes type-hand {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(4px); }
+}
+
+.rise { animation: rise 2.6s ease-in-out infinite; }
+@keyframes rise {
+    0%   { opacity: 0; transform: translateY(6px); }
+    25%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-16px); }
+}
+.rise-2 { animation-delay: 0.8s; }
+.rise-3 { animation-delay: 1.6s; }
+
+.pop { animation: pop 0.55s cubic-bezier(0.22, 1.4, 0.4, 1) both; }
+@keyframes pop {
+    from { opacity: 0; transform: scale(0.5); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.steam { animation: steam 2.8s ease-in-out infinite; }
+.steam-2 { animation-delay: 0.9s; }
+@keyframes steam {
+    0%   { opacity: 0; transform: translateY(4px) scaleX(0.9); }
+    35%  { opacity: 0.8; }
+    100% { opacity: 0; transform: translateY(-14px) scaleX(1.15); }
+}
+
+/* 動きを減らす設定を尊重する */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001s !important;
+    }
+}
+
+/* ==========================================
+   せまい画面
+   ========================================== */
+@media (max-width: 640px) {
+    body { font-size: 16px; padding: 18px 14px 48px; }
+    .panel { padding: 22px 16px; border-radius: 18px; }
+    .how-item { grid-template-columns: 38px 1fr; grid-template-rows: auto auto; }
+    .how-art { display: none; }
+    .stepper-item { width: 78px; font-size: 0.76em; }
+    .romaji-display { font-size: 27px; }
+    .japanese-display { font-size: 22px; }
+    h1 { font-size: 1.6em; }
+}
+
+/* ==========================================
+   やり方ムービー（howto.html）
+   ========================================== */
+.movie {
+    position: relative;
+    background: #ffffff;
+    border: 2px solid var(--line);
+    border-radius: 26px;
+    box-shadow: var(--shadow);
+    padding: 26px 24px 20px;
+    overflow: hidden;
+}
+.movie-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 6px;
+    background: var(--blue);
+    width: 0;
+    transition: width 0.2s linear;
+}
+.movie-chapter {
+    display: inline-block;
+    color: var(--blue);
+    font-size: 0.84em;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+.scene {
+    display: none;
+    animation: scene-in 0.5s cubic-bezier(0.22, 1.2, 0.4, 1) both;
+}
+.scene.active { display: block; }
+@keyframes scene-in {
+    from { opacity: 0; transform: translateX(26px); }
+    to   { opacity: 1; transform: none; }
+}
+.scene-art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 215px;
+    flex-wrap: wrap;
+}
+.scene-art > span { display: block; width: 215px; max-width: 42vw; }
+.scene-art > span.wide { width: 330px; max-width: 72vw; }
+.scene-art svg { width: 100%; height: auto; }
+.scene-arrow {
+    width: 36px !important;
+    color: var(--blue);
+    font-size: 1.8em;
+    font-weight: 800;
+    animation: nudge 1.4s ease-in-out infinite;
+}
+@keyframes nudge {
+    0%, 100% { transform: translateX(0); }
+    50%      { transform: translateX(7px); }
+}
+.scene h2 { margin-top: 6px; }
+.scene p {
+    color: var(--sub);
+    max-width: 30em;
+    margin: 0 auto;
+}
+.scene .point {
+    display: inline-block;
+    margin-top: 14px;
+    background: var(--yellow-pale);
+    border: 2px solid #f3dca2;
+    color: #8a6500;
+    border-radius: 14px;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 0.95em;
+}
+.dots {
+    display: flex;
+    justify-content: center;
+    gap: 9px;
+    margin: 18px 0 4px;
+}
+.dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--line);
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.dot:hover { transform: none; box-shadow: none; background: #b9d2e0; }
+.dot.active { background: var(--blue); transform: scale(1.35); }
+.dot.seen { background: #9fd4f0; }
+.movie-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.movie-controls button { padding: 12px 24px; font-size: 0.96em; }
+.movie-hint { color: var(--sub); font-size: 0.86em; margin-top: 12px; }
+
+/* ==========================================
+   測定中の大きな数字（measure.html）
+   ========================================== */
+.big-step {
+    display: none;
+    background: var(--tint);
+    border: 2px solid var(--line);
+    border-radius: 18px;
+    padding: 14px 20px 18px;
+    margin: 18px 0;
+}
+.big-step .big-step-label { color: var(--sub); font-size: 0.88em; font-weight: 700; }
+.big-step-value {
+    font-size: 4.4em;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--blue);
+    font-variant-numeric: tabular-nums;
+}
+.big-step-meter {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 6px;
+}
+.big-step-meter i {
+    display: block;
+    width: 10px;
+    height: 16px;
+    border-radius: 3px;
+    background: var(--line);
+}
+.big-step-meter i.on { background: var(--blue); }
+
+/* 読み込み中のくるくる */
+.spinner {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    border: 5px solid var(--line);
+    border-top-color: var(--blue);
+    animation: spin 0.9s linear infinite;
+}
+
+/* ==========================================
+   セッションの流れ（game.html）
+   ========================================== */
+.flow {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin: 18px 0 6px;
+}
+.flow-item {
+    flex: 0 0 auto;
+    width: 78px;
+    background: var(--tint);
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    padding: 8px 4px 7px;
+    color: var(--sub);
+    font-size: 0.74em;
+    font-weight: 700;
+    line-height: 1.35;
+}
+.flow-item .flow-icon { font-size: 1.5em; line-height: 1.3; display: block; }
+.flow-item.done { background: var(--green-pale); border-color: #b6e9cd; color: #1d8a55; }
+.flow-item.current {
+    background: var(--blue);
+    border-color: #0b8fd0;
+    color: #ffffff;
+    box-shadow: 0 5px 0 #0b7cb5;
+    transform: translateY(-3px);
+}
+.flow-item.rest { width: 56px; }
+
+/* 進捗バー */
+.progress-track {
+    height: 14px;
+    border-radius: 999px;
+    background: var(--tint);
+    border: 2px solid var(--line);
+    overflow: hidden;
+    margin: 0 auto 18px;
+    max-width: 520px;
+}
+.progress-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #5ccbf9, var(--blue));
+    transition: width 0.3s ease-out;
+}
+
+/* いま鳴っているもの・押すキーの常設ガイド */
+.play-guide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    background: var(--tint);
+    border: 2px solid var(--line);
+    border-radius: 18px;
+    padding: 12px 18px;
+    margin-bottom: 18px;
+}
+.play-guide .guide-art { width: 84px; }
+.play-guide .guide-art.wide { width: 128px; }
+.play-guide .guide-art svg { width: 100%; height: auto; }
+.play-guide .guide-text { text-align: left; font-size: 0.92em; font-weight: 700; color: var(--ink); }
+.play-guide .guide-text span { display: block; color: var(--sub); font-weight: 500; font-size: 0.88em; }
+
+/* 結果の読みかた */
+.result-list {
+    display: grid;
+    gap: 10px;
+    text-align: left;
+    margin-bottom: 20px;
+}
+.result-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--tint);
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 18px;
+}
+.result-row .result-name { font-weight: 700; }
+.result-row .result-name span { display: block; color: var(--sub); font-size: 0.8em; font-weight: 500; }
+.result-row strong { font-size: 1.3em; color: var(--blue-dark); font-variant-numeric: tabular-nums; }
+.result-row.sub strong { font-size: 1em; color: var(--sub); }
+
+/* 流れ表示のアイコン（SVG） */
+.flow-item .flow-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    height: 20px;
+    margin-bottom: 4px;
+}
+.flow-item .flow-icon svg { height: 100%; width: auto; }

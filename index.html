@@ -2,26 +2,91 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Hearing Training System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>聴覚注意トレーニング</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
+            <div class="art-stage art-float" data-art="hero" style="max-width:260px;margin:0 auto;"></div>
             <h1>聴覚注意トレーニング</h1>
+            <p class="lead">音を聞きながら文字を打つ練習です。<br>上から順番に進めば大丈夫です。</p>
         </header>
 
+        <div id="stepper" class="stepper" data-current="home"></div>
+
         <div class="panel">
-            <button onclick="location.href='calibrate.html'" class="btn-primary btn-block">
-                Step 0: 音量調整 (60dB設定)
-            </button>
-            <button onclick="location.href='measure.html'" class="btn-secondary btn-block">
-                Step 1: 基準聴力の測定
-            </button>
-            <button onclick="location.href='game.html'" class="btn-secondary btn-block">
-                Step 2: トレーニング開始
-            </button>
+            <h3>はじめての方は、まずこちら</h3>
+            <div class="art-stage" data-art="screenGuide" style="max-width:300px;margin:0 auto;"></div>
+            <p class="instruction">30秒ほどのアニメーションで、やることを全部お見せします。</p>
+            <button onclick="location.href='howto.html'" class="btn-primary btn-big">▶ やり方をみる</button>
+        </div>
+
+        <div class="panel">
+            <h3>進める順番</h3>
+            <p class="instruction">上の「やり方」を見たら、1 → 2 → 3 の順に押してください。</p>
+            <div class="menu-grid">
+                <button class="menu-card" onclick="location.href='calibrate.html'">
+                    <span class="menu-art" data-art="phoneMeter"></span>
+                    <span class="menu-step">STEP 1</span>
+                    <span class="menu-name">音量を合わせる</span>
+                    <span class="menu-desc">スマホの騒音計アプリで、パソコンの音を 60dB にそろえます。</span>
+                    <span class="menu-time" data-done="calibrate">約3分</span>
+                </button>
+                <button class="menu-card" onclick="location.href='measure.html'">
+                    <span class="menu-art" data-art="listening"></span>
+                    <span class="menu-step">STEP 2</span>
+                    <span class="menu-name">聞こえ方をはかる</span>
+                    <span class="menu-desc">静かな部屋で、あなたにギリギリ聞こえる音の大きさを調べます。</span>
+                    <span class="menu-time" data-done="measure">約3分</span>
+                </button>
+                <button class="menu-card" onclick="location.href='game.html'">
+                    <span class="menu-art" data-art="dual"></span>
+                    <span class="menu-step">STEP 3</span>
+                    <span class="menu-name">本番セッション</span>
+                    <span class="menu-desc">雑音の中で文字を打ちながら、音が鳴ったらスペースキー。</span>
+                    <span class="menu-time" data-done="game">約25分</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="panel flat">
+            <h3>用意するもの</h3>
+            <div class="how-list">
+                <div class="how-item">
+                    <span class="how-num">1</span>
+                    <span class="how-art" data-art="phoneMeter"></span>
+                    <span class="how-text"><b>騒音計アプリを入れたスマートフォン</b>
+                        <span class="small">STEP 1 の音量合わせだけで使います。</span></span>
+                </div>
+                <div class="how-item">
+                    <span class="how-num">2</span>
+                    <span class="how-art" data-art="speaker"></span>
+                    <span class="how-text"><b>パソコンのスピーカー</b>
+                        <span class="small">イヤホンではなく、スピーカーから音を出してください。</span></span>
+                </div>
+                <div class="how-item">
+                    <span class="how-num">3</span>
+                    <span class="how-art" data-art="typing"></span>
+                    <span class="how-text"><b>キーボード</b>
+                        <span class="small">ローマ字入力で打ちます。日本語入力は OFF のままで大丈夫です。</span></span>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script src="js/ui.js"></script>
+    <script>
+        // 終わった段階には「すみました」と出す。
+        document.querySelectorAll('[data-done]').forEach((el) => {
+            if (!UI.isDone(el.dataset.done)) return;
+            el.textContent = '✓ すみました';
+            el.className = 'menu-done';
+        });
+    </script>
 </body>
 </html>

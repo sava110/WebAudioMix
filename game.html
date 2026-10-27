@@ -2,37 +2,60 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Dual Task Training</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>STEP 3: 本番セッション</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h2>Step 2: 本番セッション</h2>
+            <h2>STEP 3　本番セッション</h2>
         </header>
 
+        <div id="stepper" class="stepper" data-current="game"></div>
+
         <div id="setupPanel" class="panel">
-            <h3>セッションの流れ</h3>
-            <div id="loadStatus" style="margin: 20px 0; padding: 10px; background: #22303f; border-radius: 5px;">
-                環境音を読み込んでいます...
+            <div class="art-stage" data-art="dual" style="max-width:300px;margin:0 auto;"></div>
+            <h3>これからの流れ</h3>
+            <p class="instruction">全部で8つの課題と、あいだの休憩があります。いま何番目かは画面の上に出ます。</p>
+            <div id="setupFlow" class="flow"></div>
+
+            <h3 style="margin-top:28px;">覚えることは2つだけ</h3>
+            <div class="how-list">
+                <div class="how-item">
+                    <span class="how-num">1</span>
+                    <span class="how-art" data-art="spacebar"></span>
+                    <span class="how-text"><b>「ピー」が聞こえたら、スペースキーを1回</b>
+                        <span class="small">雑音はずっと鳴っています。その中にまざる「ピー」に答えてください。</span></span>
+                </div>
+                <div class="how-item">
+                    <span class="how-num">2</span>
+                    <span class="how-art" data-art="louder"></span>
+                    <span class="how-text"><b>まちがえても終わりません</b>
+                        <span class="small">聞き逃したときや、鳴っていないのに押したときは、次の音が10dB大きくなります。そのまま続けてください。</span></span>
+                </div>
             </div>
-            <p class="instruction" style="text-align:left;">
-                1. 本番前：文字だけ 1分（音は鳴らない）<br>
-                2. 本番前：音だけ 1分（文字は打たない）<br>
-                3. 本番を 3回。各回は音が 20回鳴ったら終わる。あいだに休憩とアンケート<br>
-                4. 本番後：文字だけ 1分、音だけ 1分
-            </p>
-            <p class="instruction">
-                音が鳴ったらスペースキー。ミスすると次の音は 10 dB 大きくなります。2回ミスでは終わりません。
-            </p>
-            <button id="btnStart" class="btn-primary" disabled>セッション開始</button>
+
+            <div id="loadStatus" class="load-status">環境音を読み込んでいます…</div>
+            <div>
+                <button id="btnStart" class="btn-primary btn-big" disabled>セッション開始</button>
+            </div>
+            <p class="instruction">はじめる前に、日本語入力（かな入力）が OFF になっているか確認してください。</p>
         </div>
 
         <div id="introPanel" class="panel hidden">
             <p id="introStep" class="step-label"></p>
             <h3 id="introTitle">準備</h3>
+            <div id="introArt" class="art-stage" style="max-width:300px;margin:0 auto;"></div>
+            <div id="introFlow" class="flow"></div>
             <p id="introText" class="instruction"></p>
-            <button id="btnPhaseStart" class="btn-primary">開始</button>
+            <div id="introPoint" class="bubble" style="margin-top:6px;"></div>
+            <div>
+                <button id="btnPhaseStart" class="btn-primary btn-big">用意ができたら開始</button>
+            </div>
         </div>
 
         <div id="gamePanel" class="panel hidden">
@@ -52,12 +75,19 @@
                     <span class="value" id="dispKpm">0</span>
                 </div>
             </div>
+            <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+
+            <div id="playGuide" class="play-guide">
+                <span class="guide-art" id="guideNoise" data-art="fan"></span>
+                <span class="guide-art wide" id="guideKey" data-art="spacebar"></span>
+                <span class="guide-text" id="guideText"></span>
+            </div>
 
             <div class="typing-area" id="typingArea">
                 <div class="romaji-display" id="romajiDisplay"></div>
                 <div class="japanese-display" id="japaneseDisplay"></div>
             </div>
-            <p id="listenMessage" class="instruction hidden">雑音の中で音が鳴ったら、スペースキーを押してください。</p>
+            <p id="listenMessage" class="instruction hidden">雑音の中で「ピー」が鳴ったら、スペースキーを押してください。</p>
 
             <div id="hearingFeedback" class="feedback-hidden">Good!</div>
             <button id="btnStop" class="btn-danger">このブロックを中断</button>
@@ -65,32 +95,56 @@
 
         <div id="breakPanel" class="panel hidden">
             <p id="breakStep" class="step-label"></p>
-            <h3>休憩</h3>
-            <p id="breakNext" class="instruction"></p>
-            <p class="instruction">3分休んで、アンケートに答えてください。</p>
+            <div class="art-stage art-float" data-art="breakTea" style="max-width:170px;margin:0 auto;"></div>
+            <h3>休憩しましょう</h3>
             <p id="breakClock" class="break-clock">3:00</p>
-            <button id="btnBreakDone" class="btn-primary">次の回へ</button>
+            <p class="instruction">3分休んで、アンケートに答えてください。<br>画面から目をはなして、耳を休めてください。</p>
+            <p id="breakNext" class="bubble"></p>
+            <div>
+                <button id="btnBreakDone" class="btn-primary btn-big">次の回へ ▶</button>
+            </div>
         </div>
 
         <div id="resultPanel" class="panel hidden">
+            <div class="art-stage" data-art="check" style="max-width:120px;margin:0 auto;"></div>
             <h3 id="resultTitle">ブロック結果</h3>
-            <div style="text-align: left; background: #22303f; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <p>打鍵速度 (KPM): <strong id="resKpm">---</strong></p>
-                <p>音への正解: <strong id="resHits">---</strong></p>
-                <p>平均の反応時間: <strong id="resRt">---</strong></p>
-                <p style="font-size: 0.9em; color: #bdc3c7;">最後に正解した音量（参考。配分の指標には使いません）: <span id="resLastDb">---</span></p>
+            <div class="result-list">
+                <div class="result-row">
+                    <span class="result-name">打った速さ<span>1分あたりの打鍵数（KPM）</span></span>
+                    <strong id="resKpm">---</strong>
+                </div>
+                <div class="result-row">
+                    <span class="result-name">気づけた音<span>鳴った回数のうち、押せた回数</span></span>
+                    <strong id="resHits">---</strong>
+                </div>
+                <div class="result-row">
+                    <span class="result-name">反応の速さ<span>音が鳴ってから押すまでの平均</span></span>
+                    <strong id="resRt">---</strong>
+                </div>
+                <div class="result-row sub">
+                    <span class="result-name">最後に気づけた音量<span>参考値。成績ではありません</span></span>
+                    <strong id="resLastDb">---</strong>
+                </div>
             </div>
-            <button id="btnNext" class="btn-primary">次へ</button>
-            <button id="btnDownloadCsv" class="btn-secondary">ここまでのCSV</button>
+            <div class="btn-row">
+                <button id="btnNext" class="btn-primary btn-big">次へ ▶</button>
+                <button id="btnDownloadCsv" class="btn-secondary">ここまでのCSV</button>
+            </div>
         </div>
 
         <div id="donePanel" class="panel hidden">
-            <h3>セッション完了</h3>
-            <div id="doneSummary" style="text-align:left;"></div>
-            <button id="btnDownloadFinal" class="btn-primary">セッションCSV</button>
-            <button onclick="location.reload()" class="btn-secondary">最初に戻る</button>
+            <div class="art-stage" data-art="celebrate" style="max-width:260px;margin:0 auto;"></div>
+            <h3>おつかれさまでした！</h3>
+            <p class="instruction">すべての課題が終わりました。実験者に声をかけてください。</p>
+            <div id="doneSummary" class="result-list"></div>
+            <div class="btn-row">
+                <button id="btnDownloadFinal" class="btn-primary">セッションCSV</button>
+                <button onclick="location.reload()" class="btn-secondary">最初に戻る</button>
+            </div>
         </div>
     </div>
+
+    <script src="js/ui.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/romaji.js"></script>
     <script src="js/game.js"></script>

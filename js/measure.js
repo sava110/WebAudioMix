@@ -34,6 +34,8 @@ const els = {
     btnStartMeasure: document.getElementById('btnStartMeasure'),
     resultValue: document.getElementById('resultValue'),
     stepCounter: document.getElementById('stepCounter'),
+    stepBox: document.getElementById('stepBox'),
+    stepMeter: document.getElementById('stepMeter'),
     // 試行回数表示用（任意でHTMLに追加してください）
     trialInfo: document.getElementById('trialInfo') 
 };
@@ -46,7 +48,9 @@ window.onload = async () => {
         els.loadingPanel.classList.add('hidden');
         els.measurePanel.classList.remove('hidden');
     } catch (err) {
-        alert("音声ファイルの読み込みに失敗しました。\n" + err);
+        els.loadingPanel.innerHTML = '<h3>音を読み込めませんでした</h3>'
+            + '<p class="instruction">ページを再読み込みしても直らないときは、実験者に伝えてください。</p>';
+        els.loadingPanel.className = 'panel';
     }
 };
 
@@ -77,10 +81,9 @@ async function startMeasurement() {
     els.btnStartMeasure.disabled = true;
     if (document.activeElement) document.activeElement.blur();
 
-    if (els.stepCounter) {
-        els.stepCounter.style.display = "block";
-        els.stepCounter.textContent = "1";
-    }
+    if (els.stepBox) els.stepBox.style.display = "block";
+    if (els.stepCounter) els.stepCounter.textContent = "1";
+    showStep(MIN_DB);
 
     await new Promise(resolve => setTimeout(resolve, 2000));
     if (!isMeasuring) return;
@@ -90,9 +93,8 @@ async function startMeasurement() {
         acceptingResponse = true;
         showStep(currentDB);
 
-        els.statusBox.textContent = "再生中...";
-        els.statusBox.style.background = "#fff3cd";
-        els.statusBox.style.color = "#856404";
+        els.statusBox.textContent = "🔊 いま鳴っています　→　聞こえたらスペースキー";
+        els.statusBox.className = "status-box is-playing";
 
         currentVol = TONE.dbToGain(currentDB);
 
@@ -100,9 +102,8 @@ async function startMeasurement() {
         await playTone(currentVol, TONE_DURATION);
 
         if (!isMeasuring) break;
-        els.statusBox.textContent = "待機中...";
-        els.statusBox.style.background = "#22303f";
-        els.statusBox.style.color = "#ecf0f1";
+        els.statusBox.textContent = "… つぎの音を待っています";
+        els.statusBox.className = "status-box";
 
         await new Promise(resolve => setTimeout(resolve, PAUSE_DURATION * 1000));
         acceptingResponse = false;
@@ -126,19 +127,25 @@ function clampDb(db) {
 }
 
 function showStep(db) {
-    if (!els.stepCounter) return;
-    const step = (db / DB_STEP) + 1;
-    els.stepCounter.textContent = String(Math.max(1, step));
+    const step = Math.max(1, (db / DB_STEP) + 1);
+    const total = (REF_DB / DB_STEP) + 1;
+    if (els.stepCounter) els.stepCounter.textContent = String(step);
+    // 何段目かを目でも分かるようにする。
+    if (els.stepMeter) {
+        els.stepMeter.innerHTML = Array.from({ length: total },
+            (_, i) => `<i class="${i < step ? 'on' : ''}"></i>`).join('');
+    }
 }
 
 function abortAtCeiling() {
     isMeasuring = false;
     acceptingResponse = false;
     restartFrom = null;
-    els.statusBox.textContent = "上限の 60 dB まで大きくしても、スペースキーは押されませんでした。測定を中断しました。はじめからやり直してください。";
-    els.statusBox.style.background = "#f8d7da";
-    els.statusBox.style.color = "#721c24";
-    if (els.stepCounter) els.stepCounter.style.display = "none";
+    els.statusBox.innerHTML = "いちばん大きい音（60 dB）まで上げても、スペースキーが押されませんでした。"
+        + '<span class="instruction" style="display:block;font-size:0.8em;">'
+        + "スピーカーの音量と、キーボードのスペースキーを確かめて、もう一度お願いします。</span>";
+    els.statusBox.className = "status-box is-error";
+    if (els.stepBox) els.stepBox.style.display = "none";
     els.btnStartMeasure.disabled = false;
     els.btnStartMeasure.textContent = "もう一度測定する";
 }
@@ -175,10 +182,11 @@ function saveAndShowResult(db) {
     localStorage.setItem('userBaseThresholdGain', finalGain);
 
     els.statusBox.textContent = "測定完了";
-    if (els.stepCounter) els.stepCounter.style.display = "none";
+    els.statusBox.className = "status-box is-ok";
+    if (els.stepBox) els.stepBox.style.display = "none";
 
     const finalStep = (db / DB_STEP) + 1;
-    els.resultValue.innerHTML = `確定値: ${db} dB (Step: ${finalStep})`;
+    els.resultValue.innerHTML = `${db} dB　<span style="font-size:0.7em;color:#6b8296;">（${finalStep}段目）</span>`;
 
     els.measurePanel.classList.add('hidden');
     els.resultPanel.classList.remove('hidden');

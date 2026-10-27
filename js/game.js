@@ -29,23 +29,33 @@ function initialDB() {
 }
 
 const PHASES = [
-    { id: 'pre_typing', kind: 'typing', title: '本番前：文字だけ（1分）' },
-    { id: 'pre_sound', kind: 'sound', title: '本番前：音だけ（1分）' },
-    { id: 'dual_1', kind: 'dual', title: '本番 1回目（音20回）' },
-    { id: 'break_1', kind: 'break', title: '休憩' },
-    { id: 'dual_2', kind: 'dual', title: '本番 2回目（音20回）' },
-    { id: 'break_2', kind: 'break', title: '休憩' },
-    { id: 'dual_3', kind: 'dual', title: '本番 3回目（音20回）' },
-    { id: 'break_3', kind: 'break', title: '休憩' },
-    { id: 'post_typing', kind: 'typing', title: '本番後：文字だけ（1分）' },
-    { id: 'post_sound', kind: 'sound', title: '本番後：音だけ（1分）' }
+    { id: 'pre_typing', kind: 'typing', title: '本番前：文字だけ（1分）', icon: 'key', short: '文字<br>1分' },
+    { id: 'pre_sound', kind: 'sound', title: '本番前：音だけ（1分）', icon: 'sound', short: '音<br>1分' },
+    { id: 'dual_1', kind: 'dual', title: '本番 1回目（音20回）', icon: 'both', short: '本番<br>1回目' },
+    { id: 'break_1', kind: 'break', title: '休憩', icon: 'rest', short: '休憩' },
+    { id: 'dual_2', kind: 'dual', title: '本番 2回目（音20回）', icon: 'both', short: '本番<br>2回目' },
+    { id: 'break_2', kind: 'break', title: '休憩', icon: 'rest', short: '休憩' },
+    { id: 'dual_3', kind: 'dual', title: '本番 3回目（音20回）', icon: 'both', short: '本番<br>3回目' },
+    { id: 'break_3', kind: 'break', title: '休憩', icon: 'rest', short: '休憩' },
+    { id: 'post_typing', kind: 'typing', title: '本番後：文字だけ（1分）', icon: 'key', short: '文字<br>1分' },
+    { id: 'post_sound', kind: 'sound', title: '本番後：音だけ（1分）', icon: 'sound', short: '音<br>1分' }
 ];
 
 const INTRO = {
-    typing: '音は鳴りません。画面の文字を、1分間打ってください。お題は500種類あり、このセッション中は同じお題を繰り返しません。si と shi のように、同じ音なら別の打ち方でも進めます。速さは1分間の打鍵数（KPM）で記録します。',
-    sound: '文字は打ちません。換気扇の音の中で「ピー」が鳴ったら、スペースキーを押してください。判定後の待ち時間（フィードバック時間を除く）は2〜12秒で毎回変わります。1分で終わります。ミスしても続き、次の音は10 dB大きくなります。',
-    dual: '換気扇の音の中で文字を打ちながら、鳴った音にスペースキーで答えてください。お題は500種類あり、このセッション中は同じお題を繰り返しません。判定後の待ち時間（フィードバック時間を除く）は2〜12秒で毎回変わります。音は20回鳴ったら終わります。2回ミスでは終わりません。ミスすると次の音は10 dB大きくなります。'
+    typing: '音は鳴りません。画面に出る言葉を、下のローマ字どおりに1分間打ってください。',
+    sound: '文字は打ちません。雑音の中で「ピー」が鳴ったら、スペースキーを押してください。1分で終わります。',
+    dual: '文字を打ちながら、「ピー」が鳴ったらスペースキーを押してください。音が20回鳴ったら終わります。'
 };
+
+// 読まなくても一番伝えたいこと。
+const INTRO_POINT = {
+    typing: 'si でも shi でも、同じ音ならどちらでも進みます',
+    sound: '次に鳴るまでは 2〜12秒。間隔はばらばらです',
+    dual: 'どちらも大事です。片方だけに集中しなくて大丈夫です'
+};
+
+// 課題ごとの絵。
+const INTRO_ART = { typing: 'typing', sound: 'listening', dual: 'dual' };
 
 // html は漢字の上の振り仮名。
 const BASE_WORD_LIST = [
@@ -305,6 +315,15 @@ const els = {
     btnDownloadCsv: document.getElementById('btnDownloadCsv'),
     btnDownloadFinal: document.getElementById('btnDownloadFinal'),
     introTitle: document.getElementById('introTitle'),
+    introArt: document.getElementById('introArt'),
+    introPoint: document.getElementById('introPoint'),
+    introFlow: document.getElementById('introFlow'),
+    setupFlow: document.getElementById('setupFlow'),
+    progressFill: document.getElementById('progressFill'),
+    playGuide: document.getElementById('playGuide'),
+    guideNoise: document.getElementById('guideNoise'),
+    guideKey: document.getElementById('guideKey'),
+    guideText: document.getElementById('guideText'),
     introStep: document.getElementById('introStep'),
     introText: document.getElementById('introText'),
     phaseTitle: document.getElementById('phaseTitle'),
@@ -327,18 +346,35 @@ const els = {
 };
 
 window.onload = async () => {
+    renderFlow(els.setupFlow, null);
     try {
         initAudio();
-        els.loadStatus.textContent = '環境音を読み込み中...';
+        els.loadStatus.textContent = '⏳ 雑音の音を読み込んでいます…';
         noiseBuffer = await loadAudioFromPath(NOISE_FILE_PATH);
-        els.loadStatus.textContent = '環境音の準備完了';
-        els.loadStatus.style.color = '#2ecc71';
+        els.loadStatus.textContent = '✓ 準備ができました';
+        els.loadStatus.style.color = '#1d8a55';
         els.btnStart.disabled = false;
     } catch (err) {
-        els.loadStatus.textContent = '環境音の読み込みに失敗しました。';
-        els.loadStatus.style.color = '#e74c3c';
+        els.loadStatus.textContent = '✕ 音を読み込めませんでした。実験者に伝えてください。';
+        els.loadStatus.style.color = '#c0392b';
     }
 };
+
+// セッション全体のどこにいるかを、絵と色で示す。
+function renderFlow(host, currentId) {
+    if (!host) return;
+    const currentIndex = PHASES.findIndex((p) => p.id === currentId);
+    host.innerHTML = PHASES.map((phase, i) => {
+        const done = currentIndex >= 0 && i < currentIndex;
+        const state = phase.id === currentId ? 'current' : (done ? 'done' : '');
+        const rest = phase.kind === 'break' ? 'rest' : '';
+        const icon = done ? UI.ICON.done
+            : (phase.icon === 'both' ? UI.ICON.key + UI.ICON.sound : UI.ICON[phase.icon]);
+        return `<div class="flow-item ${state} ${rest}">
+                    <span class="flow-icon">${icon}</span>${phase.short}
+                </div>`;
+    }).join('');
+}
 
 function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -364,7 +400,7 @@ function showBreak() {
     clearInterval(breakTimer);
     const next = PHASES[phaseIndex + 1];
     els.breakStep.textContent = '休憩';
-    els.breakNext.textContent = next ? `このあとは「${next.title}」です。` : '';
+    els.breakNext.textContent = next ? `このあとは「${next.title}」です` : '';
     els.breakPanel.classList.remove('hidden');
     const endsAt = performance.now() + 3 * 60 * 1000;
     const paint = () => {
@@ -413,6 +449,9 @@ function advance() {
     els.introStep.textContent = taskStepLabel(phase);
     els.introTitle.textContent = phase.title;
     els.introText.textContent = INTRO[phase.kind];
+    els.introPoint.textContent = INTRO_POINT[phase.kind];
+    els.introArt.innerHTML = UI.ART[INTRO_ART[phase.kind]]();
+    renderFlow(els.introFlow, phase.id);
     els.introPanel.classList.remove('hidden');
 }
 
@@ -440,6 +479,7 @@ function startBlock() {
     els.typingArea.classList.toggle('hidden', !typingOn);
     els.listenMessage.classList.toggle('hidden', phase.kind !== 'sound');
     els.progressLabel.textContent = phase.kind === 'dual' ? '鳴った音' : '残り時間';
+    setPlayGuide(phase);
     if (typingOn) nextWord();
     if (phase.kind !== 'typing') playNoiseLoop();
     updateHud();
@@ -460,6 +500,21 @@ function startBlock() {
         scheduleNextSound();
     }
     if (document.activeElement) document.activeElement.blur();
+}
+
+// 音が鳴った瞬間の合図にはしない（目で分かると実験にならない）。
+// 課題のあいだずっと同じ絵を出しておくだけ。
+function setPlayGuide(phase) {
+    const noiseOn = phase.kind !== 'typing';
+    els.guideNoise.classList.toggle('hidden', !noiseOn);
+    els.guideKey.classList.toggle('hidden', !noiseOn);
+    if (phase.kind === 'typing') {
+        els.guideText.innerHTML = '音は鳴りません<span>画面の言葉をローマ字で打ち続けてください</span>';
+    } else if (phase.kind === 'sound') {
+        els.guideText.innerHTML = '雑音が鳴っています<span>「ピー」に気づいたらスペースキー。文字は打ちません</span>';
+    } else {
+        els.guideText.innerHTML = '雑音が鳴っています<span>打ちながら、「ピー」に気づいたらスペースキー</span>';
+    }
 }
 
 function playNoiseLoop() {
@@ -551,12 +606,14 @@ function handleHearingResult(outcome, reactionTime) {
         hitRtSum += reactionTime;
         lastSuccessDB = presentedDb;
         currentDB = Math.max(MIN_DB, currentDB - STEP_DOWN);
-        showFeedback(`音に気づけた<br><span style="font-size:0.6em;">${Math.round(reactionTime)} ms</span>`, true, 1000, afterFeedback);
+        showFeedback(`◎ 音に気づけた<br><span style="font-size:0.62em;font-weight:600;">${Math.round(reactionTime)} ms　次の音は少し小さくなります</span>`, true, 1000, afterFeedback);
         return;
     }
 
     currentDB = Math.min(MAX_DB, currentDB + STEP_UP);
-    const label = outcome === 'false_alarm' ? 'お手つき（+10 dB）' : '聞き逃し（+10 dB）';
+    const label = outcome === 'false_alarm'
+        ? '△ 鳴っていないときに押しました<br><span style="font-size:0.62em;font-weight:600;">次の音は 10 dB 大きくなります</span>'
+        : '△ 音を聞き逃しました<br><span style="font-size:0.62em;font-weight:600;">次の音は 10 dB 大きくなります</span>';
     showFeedback(label, false, 2000, afterFeedback);
 }
 
@@ -637,11 +694,13 @@ function showBlockResult(summary) {
 
 function showDone() {
     hideAll();
+    UI.markDone('game');
     els.donePanel.classList.remove('hidden');
     els.doneSummary.innerHTML = sessionPhases.map((p) => {
         const kpmText = p.kind === 'sound' ? '文字なし' : `KPM ${p.kpm.toFixed(1)}`;
-        const hitText = p.kind === 'typing' ? '' : ` / 正解 ${p.hitCount}/${p.soundsPlayed}`;
-        return `<p>${p.title}：${kpmText}${hitText}</p>`;
+        const hitText = p.kind === 'typing' ? '' : `　気づけた音 ${p.hitCount}/${p.soundsPlayed}`;
+        return `<div class="result-row"><span class="result-name">${p.title}</span>`
+             + `<strong style="font-size:1em;">${kpmText}${hitText}</strong></div>`;
     }).join('');
 }
 
@@ -688,10 +747,12 @@ function updateHud() {
     els.dispCurrentVol.textContent = phase.kind === 'typing' ? '—' : `${currentDB} dB`;
     if (phase.kind === 'dual') {
         els.dispProgress.textContent = `${soundsPlayed} / ${DUAL_TRIALS}`;
+        els.progressFill.style.width = `${(soundsPlayed / DUAL_TRIALS) * 100}%`;
     } else {
         const left = Math.max(0, blockDeadline - performance.now());
         const sec = Math.ceil(left / 1000);
         els.dispProgress.textContent = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+        els.progressFill.style.width = `${(1 - left / BLOCK_MS) * 100}%`;
     }
 }
 
