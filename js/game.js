@@ -8,7 +8,6 @@ const RESPONSE_WINDOW = 2000;
 const BLOCK_MS = 60 * 1000;
 const DUAL_TRIALS = 20;
 const FALLBACK_START_DB = 55;
-const START_OFFSET_DB = 20;
 const MAX_DB = 80;
 const MIN_DB = 0;
 const STEP_DOWN = 5;
@@ -22,10 +21,10 @@ function loadBaseThresholdDB() {
     return Number.isFinite(db) ? db : null;
 }
 
-// 各被験者の閾値 + 20 dB から降り始める。固定値 70 では閾値まで 5 試行を空費する。
+// Step 1 で確定した dB から始める。閾値 + 20 dB では被験者によって大きすぎる。
 function initialDB() {
     if (baseThresholdDB === null) return FALLBACK_START_DB;
-    return Math.min(MAX_DB, baseThresholdDB + START_OFFSET_DB);
+    return Math.max(MIN_DB, Math.min(MAX_DB, baseThresholdDB));
 }
 
 const PHASES = [
@@ -271,7 +270,7 @@ let baseThresholdDB = loadBaseThresholdDB();
 let phaseIndex = -1;
 let blockActive = false;
 let isWaitingForResponse = false;
-let inputLock = false;
+let responseLock = false;
 let stopAfterCurrent = false;
 
 let currentDB = initialDB();
@@ -459,7 +458,7 @@ function startBlock() {
     const phase = currentPhase();
     blockActive = true;
     isWaitingForResponse = false;
-    inputLock = false;
+    responseLock = false;
     stopAfterCurrent = false;
     soundsPlayed = 0;
     keystrokes = 0;
@@ -634,13 +633,13 @@ function afterFeedback() {
 }
 
 function showFeedback(html, good, ms, thenFn) {
-    inputLock = true;
+    responseLock = true;
     const fb = els.hearingFeedback;
     fb.innerHTML = html;
     fb.className = 'feedback-visible ' + (good ? 'fb-good' : 'fb-miss');
     setTimeout(() => {
         fb.className = 'feedback-hidden';
-        inputLock = false;
+        responseLock = false;
         thenFn();
     }, ms);
 }
@@ -649,7 +648,7 @@ function endBlock(aborted) {
     if (!blockActive) return;
     blockActive = false;
     isWaitingForResponse = false;
-    inputLock = true;
+    responseLock = true;
     clearScheduledSound();
     clearTimeout(reactionTimeout);
     clearTimeout(blockTimer);
@@ -671,6 +670,7 @@ function endBlock(aborted) {
         soundsPlayed,
         hitCount,
         meanRt: hitCount ? hitRtSum / hitCount : null,
+        startDB: phase.kind === 'typing' ? null : initialDB(),
         lastSuccessDB,
         trials: trialHistory.slice()
     };
@@ -730,6 +730,8 @@ function renderWord() {
 }
 
 function checkTyping(key) {
+    // responseLock はスペースの二重入力を防ぐためのもの。
+    // 二重課題ではフィードバック表示中もタイピングを止めない。
     if (!blockActive || !typingState) return;
     const phase = currentPhase();
     if (phase.kind === 'sound') return;
@@ -767,7 +769,7 @@ document.addEventListener('keydown', (e) => {
     if (!blockActive) return;
     if (e.code === 'Space') {
         e.preventDefault();
-        if (inputLock) return;
+        if (responseLock) return;
         const phase = currentPhase();
         if (phase.kind === 'typing') return;
         if (isWaitingForResponse) {
@@ -782,11 +784,12 @@ document.addEventListener('keydown', (e) => {
 });
 
 function downloadCsv() {
-    const summaryHeader = 'Phase,Kind,Aborted,KPM,Keystrokes,Duration_ms,Sounds,Hits,Mean_RT_ms,Last_Success_dB_reference';
+    const summaryHeader = 'Phase,Kind,Aborted,KPM,Keystrokes,Duration_ms,Sounds,Hits,Mean_RT_ms,Start_dB,Last_Success_dB_reference';
     const summaryRows = sessionPhases.map((p) => [
         p.id, p.kind, p.aborted, p.kpm.toFixed(2), p.keystrokes, Math.round(p.durationMs),
         p.soundsPlayed, p.hitCount,
         p.meanRt == null ? '' : p.meanRt.toFixed(2),
+        p.startDB == null ? '' : p.startDB,
         p.lastSuccessDB == null ? '' : p.lastSuccessDB
     ].join(','));
     const trialHeader = 'Phase,Trial,Target_dB,Result,Reaction_Time_ms,Elapsed_ms,Keystrokes';
